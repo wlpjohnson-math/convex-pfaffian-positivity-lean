@@ -266,10 +266,10 @@ theorem spec_pf_twin_rows {R : Type*} [CommRing R] (n : ℕ) (A : Matrix ℕ ℕ
 
 /-! ## M2 axiom guards (enabled at the M2 proof gate) -/
 
--- /-- info: 'pf_twin_rows_consecutive' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms pf_twin_rows_consecutive
+/-- info: 'pf_twin_rows_consecutive' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms pf_twin_rows_consecutive
 
--- /-- info: 'pf_twin_rows' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms pf_twin_rows
+/-- info: 'pf_twin_rows' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms pf_twin_rows
