@@ -3,6 +3,7 @@ import PfaffianLean.Tests
 import PfaffianLean.IntervalDecomposition
 import PfaffianLean.ConvexKernel
 import PfaffianLean.TwinRows
+import PfaffianLean.CoeffPositivity
 
 /-!
 # Specification
@@ -273,3 +274,57 @@ theorem spec_pf_twin_rows {R : Type*} [CommRing R] (n : ℕ) (A : Matrix ℕ ℕ
 /-- info: 'pf_twin_rows' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms pf_twin_rows
+
+/-! ## M3 lemmas -/
+
+theorem spec_pfaffian_skewOnes {R : Type*} [CommRing R] (n : ℕ) (hn : Even n) :
+    pfaffian (Icc 1 n) (skewExtension (Matrix.of fun _ _ => (1 : R))) = 1 :=
+  pfaffian_skewOnes n hn
+
+theorem spec_corner_mem_intervals {n : ℕ} (hn : 2 ≤ n) : (1, n) ∈ intervals n :=
+  corner_mem_intervals hn
+
+theorem spec_coeff_nonneg (n : ℕ) (m : intervals n →₀ ℕ) :
+    0 ≤ (intervalPfaffian n).coeff m :=
+  coeff_nonneg n m
+
+theorem spec_intervalPfaffian_isHomogeneous (n : ℕ) :
+    (intervalPfaffian n).IsHomogeneous (n / 2) :=
+  intervalPfaffian_isHomogeneous n
+
+theorem spec_coeff_corner (n : ℕ) (hn : Even n) (h2 : 2 ≤ n) :
+    (intervalPfaffian n).coeff (Finsupp.single ⟨(1, n), corner_mem_intervals h2⟩ (n / 2)) = 1 :=
+  coeff_corner n hn h2
+
+theorem spec_intervalPfaffian_four :
+    let a : ℕ → ℕ → MvPolynomial (intervals 4) ℤ := fun p q =>
+      if h : (p, q) ∈ intervals 4 then MvPolynomial.X ⟨(p, q), h⟩ else 0
+    intervalPfaffian 4 = a 1 4 ^ 2 + a 1 4 * (a 1 2 + a 1 3 + a 2 3 + a 2 4 + a 3 4) +
+      a 1 2 * a 3 4 + a 1 2 * a 2 4 + a 1 3 * a 3 4 :=
+  intervalPfaffian_four
+
+/-! ## M3 axiom guards (enabled at the M3 proof gate) -/
+
+-- /-- info: 'pfaffian_skewOnes' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms pfaffian_skewOnes
+
+-- /-- info: 'corner_mem_intervals' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms corner_mem_intervals
+
+-- /-- info: 'coeff_nonneg' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms coeff_nonneg
+
+-- /-- info: 'intervalPfaffian_isHomogeneous' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms intervalPfaffian_isHomogeneous
+
+-- /-- info: 'coeff_corner' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms coeff_corner
+
+-- /-- info: 'intervalPfaffian_four' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms intervalPfaffian_four
