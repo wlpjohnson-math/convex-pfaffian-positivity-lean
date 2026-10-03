@@ -2,6 +2,7 @@ import PfaffianLean.Pfaffian
 import PfaffianLean.Tests
 import PfaffianLean.IntervalDecomposition
 import PfaffianLean.ConvexKernel
+import PfaffianLean.TwinRows
 
 /-!
 # Specification
@@ -245,3 +246,30 @@ theorem spec_convex_kernel_additive (f : ℝ → ℝ) (hf : ∀ t ∈ Set.Ioi (0
 /-- info: 'convex_kernel_additive' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms convex_kernel_additive
+
+/-! ## M2 lemmas -/
+
+theorem spec_pf_twin_rows_consecutive {ι : Type*} [LinearOrder ι] {R : Type*} [CommRing R]
+    {S : Finset ι} (A : Matrix ι ι R) {y y' : ι} (hy : y ∈ S) (hy' : y' ∈ S) (hyy' : y < y')
+    (hcons : ∀ z ∈ S, ¬(y < z ∧ z < y'))
+    (htwin_right : ∀ z ∈ S, y' < z → A y z = A y' z)
+    (htwin_left : ∀ z ∈ S, z < y → A z y = A z y') :
+    pfaffian S A = A y y' * pfaffian (S \ {y, y'}) A :=
+  pf_twin_rows_consecutive A hy hy' hyy' hcons htwin_right htwin_left
+
+theorem spec_pf_twin_rows {R : Type*} [CommRing R] (n : ℕ) (A : Matrix ℕ ℕ R) {y : ℕ}
+    (hy : 1 ≤ y) (hyn : y + 1 ≤ n)
+    (htwin_right : ∀ z ∈ Icc 1 n, y + 1 < z → A y z = A (y + 1) z)
+    (htwin_left : ∀ z ∈ Icc 1 n, z < y → A z y = A z (y + 1)) :
+    pfaffian (Icc 1 n) A = A y (y + 1) * pfaffian (Icc 1 n \ {y, y + 1}) A :=
+  pf_twin_rows n A hy hyn htwin_right htwin_left
+
+/-! ## M2 axiom guards (enabled at the M2 proof gate) -/
+
+-- /-- info: 'pf_twin_rows_consecutive' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms pf_twin_rows_consecutive
+
+-- /-- info: 'pf_twin_rows' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms pf_twin_rows
