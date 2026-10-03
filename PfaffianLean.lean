@@ -1,3 +1,6 @@
 import PfaffianLean.Pfaffian
 import PfaffianLean.Tests
+import PfaffianLean.Families
+import PfaffianLean.IntervalDecomposition
+import PfaffianLean.ConvexKernel
 import PfaffianLean.Spec
