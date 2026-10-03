@@ -292,7 +292,48 @@ theorem restricted_eq_mul_aeval {n : ℕ} (hn : 2 ≤ n) (T : Finset (intervals 
     rw [mem_Icc] at hi hj
     simp only [Matrix.submatrix_apply, restrictedMatrix, intervalMatrix, Matrix.map_apply,
       Matrix.of_apply, map_sum, aeval_X, b]
-    sorry
+    -- "For `i < j` in `[n] ∖ {y, y+1}`, `J` contains `i` and `j` iff `φ(J ∖ {y, y+1})` contains
+    -- `φ(i)` and `φ(j)`": here with `ψ = φ⁻¹`, and `φ(J ∖ {y, y+1})` given by `collapse`.
+    have key : ∀ J ∈ T, (ψ i ∈ Icc J.1.1 J.1.2 ∧ ψ j ∈ Icc J.1.1 J.1.2) ↔
+        ∃ J' : intervals (n - 2),
+          (i ∈ Icc J'.1.1 J'.1.2 ∧ j ∈ Icc J'.1.1 J'.1.2) ∧ collapse y J.1 = J'.1 := by
+      intro J hJT
+      have hJJ := hJ J
+      have hunc := huncut J hJT
+      constructor
+      · intro h
+        have hmem : collapse y J.1 ∈ intervals (n - 2) := by
+          simp only [intervals, collapse, mem_filter, mem_product, mem_Icc]
+          simp only [hψ_def, mem_Icc] at h
+          split_ifs at h ⊢ <;> omega
+        refine ⟨⟨collapse y J.1, hmem⟩, ?_, rfl⟩
+        simp only [collapse, mem_Icc]
+        simp only [hψ_def, mem_Icc] at h
+        split_ifs at h ⊢ <;> omega
+      · rintro ⟨J', hJ', hc⟩
+        have hJ'2 := J'.2
+        rw [← hc] at hJ'
+        rw [← hc] at hJ'2
+        simp only [intervals, collapse, mem_filter, mem_product, mem_Icc] at hJ' hJ'2 ⊢
+        simp only [hψ_def]
+        split_ifs at hJ' hJ'2 ⊢ <;> omega
+    -- "intervals whose image has at most one point enter no entry": each `J ∈ S` enters through
+    -- the single interval `φ(J ∖ {y, y+1})`, so we exchange the two sums.
+    rw [sum_filter, sum_filter]
+    have hinner : ∀ J' : intervals (n - 2),
+        (if i ∈ Icc J'.1.1 J'.1.2 ∧ j ∈ Icc J'.1.1 J'.1.2 then
+          ∑ J ∈ T with collapse y J.1 = J'.1, (X J : MvPolynomial (intervals n) ℤ) else 0) =
+        ∑ J ∈ T, if (i ∈ Icc J'.1.1 J'.1.2 ∧ j ∈ Icc J'.1.1 J'.1.2) ∧ collapse y J.1 = J'.1 then
+          X J else 0 := by
+      intro J'
+      rw [sum_filter]
+      by_cases h : i ∈ Icc J'.1.1 J'.1.2 ∧ j ∈ Icc J'.1.1 J'.1.2
+      · simp only [h, true_and, ite_true]
+      · simp only [h, false_and, ite_false, sum_const_zero]
+    rw [sum_congr rfl fun J' _ => hinner J', sum_comm]
+    refine sum_congr rfl fun J hJT => ?_
+    rw [Fintype.sum_ite_eq_ite_exists _ (fun J' J'' h' h'' => Subtype.ext (h'.2.symm.trans h''.2))]
+    exact if_congr (key J hJT) rfl rfl
   rw [pfaffian_congr hentry]
   -- "so `Pf(A^S_{[n] ∖ {y, y+1}}) = F_{n−2}(b)`" (evaluation lemma).
   have heval := RingHom.map_pfaffian (aeval b).toRingHom (Icc 1 (n - 2)) (intervalMatrix (n - 2))
