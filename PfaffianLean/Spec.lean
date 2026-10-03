@@ -305,26 +305,26 @@ theorem spec_intervalPfaffian_four :
 
 /-! ## M3 axiom guards (enabled at the M3 proof gate) -/
 
--- /-- info: 'pfaffian_skewOnes' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms pfaffian_skewOnes
+/-- info: 'pfaffian_skewOnes' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms pfaffian_skewOnes
 
--- /-- info: 'corner_mem_intervals' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms corner_mem_intervals
+/-- info: 'corner_mem_intervals' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms corner_mem_intervals
 
--- /-- info: 'coeff_nonneg' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms coeff_nonneg
+/-- info: 'coeff_nonneg' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms coeff_nonneg
 
--- /-- info: 'intervalPfaffian_isHomogeneous' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms intervalPfaffian_isHomogeneous
+/-- info: 'intervalPfaffian_isHomogeneous' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms intervalPfaffian_isHomogeneous
 
--- /-- info: 'coeff_corner' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms coeff_corner
+/-- info: 'coeff_corner' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms coeff_corner
 
--- /-- info: 'intervalPfaffian_four' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms intervalPfaffian_four
+/-- info: 'intervalPfaffian_four' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms intervalPfaffian_four
