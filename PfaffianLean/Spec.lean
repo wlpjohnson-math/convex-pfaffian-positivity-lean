@@ -1,5 +1,7 @@
 import PfaffianLean.Pfaffian
 import PfaffianLean.Tests
+import PfaffianLean.IntervalDecomposition
+import PfaffianLean.ConvexKernel
 
 /-!
 # Specification
@@ -152,3 +154,94 @@ theorem spec_pfaffian_skewOnes_six {R : Type*} [CommRing R] :
 /-- info: 'PfaffianTests.pfaffian_skewOnes_six' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms PfaffianTests.pfaffian_skewOnes_six
+
+/-! ## Definitions (M1) -/
+
+/--
+info: def intervals : ℕ → Finset (ℕ × ℕ) :=
+fun n ↦ {J ∈ Icc 1 n ×ˢ Icc 1 n | J.1 < J.2}
+-/
+#guard_msgs in
+#print intervals
+
+/--
+info: def pad : ℕ → Matrix ℕ ℕ ℝ → ℕ → ℕ → ℝ :=
+fun n K i j ↦ if i = 0 ∨ j = n + 1 then 0 else K i j
+-/
+#guard_msgs in
+#print pad
+
+/--
+info: def alpha : ℕ → Matrix ℕ ℕ ℝ → ℕ × ℕ → ℝ :=
+fun n K J ↦ pad n K J.1 J.2 - pad n K (J.1 - 1) J.2 - pad n K J.1 (J.2 + 1) + pad n K (J.1 - 1) (J.2 + 1)
+-/
+#guard_msgs in
+#print alpha
+
+/--
+info: def additiveClass : ℕ → Set (Matrix ℕ ℕ ℝ) :=
+fun n ↦ {K | ∀ J ∈ intervals n, 0 ≤ alpha n K J}
+-/
+#guard_msgs in
+#print additiveClass
+
+/--
+info: def intervalMatrix : (n : ℕ) → Matrix ℕ ℕ (MvPolynomial ↥(intervals n) ℤ) :=
+fun n ↦ Matrix.of fun i j ↦ ∑ J with i ∈ Icc (↑J).1 (↑J).2 ∧ j ∈ Icc (↑J).1 (↑J).2, MvPolynomial.X J
+-/
+#guard_msgs in
+#print intervalMatrix
+
+/--
+info: def intervalPfaffian : (n : ℕ) → MvPolynomial ↥(intervals n) ℤ :=
+fun n ↦ pfaffian (Icc 1 n) (intervalMatrix n)
+-/
+#guard_msgs in
+#print intervalPfaffian
+
+/--
+info: def kernel : (ℝ → ℝ) → (ℕ → ℝ) → Matrix ℕ ℕ ℝ :=
+fun f x ↦ Matrix.of fun i j ↦ f (x j - x i)
+-/
+#guard_msgs in
+#print kernel
+
+/-! ## M1 lemmas -/
+
+theorem spec_interval_decomposition (n : ℕ) (K : Matrix ℕ ℕ ℝ) {i j : ℕ} (hi : 1 ≤ i)
+    (hij : i < j) (hj : j ≤ n) :
+    K i j = ∑ J ∈ intervals n with i ∈ Icc J.1 J.2 ∧ j ∈ Icc J.1 J.2, alpha n K J :=
+  interval_decomposition n K hi hij hj
+
+theorem spec_interval_decomposition_pfaffian (n : ℕ) (K : Matrix ℕ ℕ ℝ) :
+    pfaffian (Icc 1 n) K =
+      MvPolynomial.aeval (fun J : intervals n => alpha n K J) (intervalPfaffian n) :=
+  interval_decomposition_pfaffian n K
+
+theorem spec_interval_decomposition_corner (n : ℕ) (K : Matrix ℕ ℕ ℝ) :
+    alpha n K (1, n) = K 1 n :=
+  interval_decomposition_corner n K
+
+theorem spec_convex_kernel_additive (f : ℝ → ℝ) (hf : ∀ t ∈ Set.Ioi (0 : ℝ), 0 ≤ f t)
+    (hanti : AntitoneOn f (Set.Ioi 0)) (hconv : ConvexOn ℝ (Set.Ioi 0) f) (n : ℕ) (x : ℕ → ℝ)
+    (hx : StrictMonoOn x (Set.Icc 1 n)) :
+    kernel f x ∈ additiveClass n ∧ alpha n (kernel f x) (1, n) = f (x n - x 1) :=
+  convex_kernel_additive f hf hanti hconv n x hx
+
+/-! ## M1 axiom guards (enabled at the M1 proof gate) -/
+
+-- /-- info: 'interval_decomposition' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms interval_decomposition
+
+-- /-- info: 'interval_decomposition_pfaffian' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms interval_decomposition_pfaffian
+
+-- /-- info: 'interval_decomposition_corner' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms interval_decomposition_corner
+
+-- /-- info: 'convex_kernel_additive' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms convex_kernel_additive
