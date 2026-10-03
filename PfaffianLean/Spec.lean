@@ -113,42 +113,42 @@ theorem spec_pfaffian_skewOnes_six {R : Type*} [CommRing R] :
 
 /-! ## M0 axiom guards (enabled at the M0 proof gate) -/
 
--- /-- info: 'pfaffian_empty' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms pfaffian_empty
+/-- info: 'pfaffian_empty' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms pfaffian_empty
 
--- /-- info: 'pfaffian_congr' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms pfaffian_congr
+/-- info: 'pfaffian_congr' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms pfaffian_congr
 
--- /-- info: 'pfaffian_skewExtension' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms pfaffian_skewExtension
+/-- info: 'pfaffian_skewExtension' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms pfaffian_skewExtension
 
--- /-- info: 'RingHom.map_pfaffian' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms RingHom.map_pfaffian
+/-- info: 'RingHom.map_pfaffian' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms RingHom.map_pfaffian
 
--- /-- info: 'pfaffian_insert_of_forall_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms pfaffian_insert_of_forall_lt
+/-- info: 'pfaffian_insert_of_forall_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms pfaffian_insert_of_forall_lt
 
--- /-- info: 'PfaffianTests.pfaffian_Icc_two' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms PfaffianTests.pfaffian_Icc_two
+/-- info: 'PfaffianTests.pfaffian_Icc_two' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms PfaffianTests.pfaffian_Icc_two
 
--- /-- info: 'PfaffianTests.pfaffian_Icc_four' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms PfaffianTests.pfaffian_Icc_four
+/-- info: 'PfaffianTests.pfaffian_Icc_four' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms PfaffianTests.pfaffian_Icc_four
 
--- /-- info: 'PfaffianTests.pfaffian_skewOnes_two' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms PfaffianTests.pfaffian_skewOnes_two
+/-- info: 'PfaffianTests.pfaffian_skewOnes_two' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms PfaffianTests.pfaffian_skewOnes_two
 
--- /-- info: 'PfaffianTests.pfaffian_skewOnes_four' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms PfaffianTests.pfaffian_skewOnes_four
+/-- info: 'PfaffianTests.pfaffian_skewOnes_four' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms PfaffianTests.pfaffian_skewOnes_four
 
--- /-- info: 'PfaffianTests.pfaffian_skewOnes_six' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms PfaffianTests.pfaffian_skewOnes_six
+/-- info: 'PfaffianTests.pfaffian_skewOnes_six' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms PfaffianTests.pfaffian_skewOnes_six
