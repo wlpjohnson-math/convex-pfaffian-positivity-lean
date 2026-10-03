@@ -4,6 +4,7 @@ import PfaffianLean.IntervalDecomposition
 import PfaffianLean.ConvexKernel
 import PfaffianLean.TwinRows
 import PfaffianLean.CoeffPositivity
+import PfaffianLean.LowerBounds
 
 /-!
 # Specification
@@ -328,3 +329,30 @@ theorem spec_intervalPfaffian_four :
 /-- info: 'intervalPfaffian_four' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms intervalPfaffian_four
+
+/-! ## M4 lemmas -/
+
+theorem spec_additive_lower_bound (n : ℕ) (hn : Even n) (h2 : 2 ≤ n) (K : Matrix ℕ ℕ ℝ)
+    (hK : K ∈ additiveClass n) :
+    pfaffian (Icc 1 n) K =
+        MvPolynomial.aeval (fun J : intervals n => alpha n K J) (intervalPfaffian n) ∧
+      MvPolynomial.aeval (fun J : intervals n => alpha n K J) (intervalPfaffian n) ≥
+        K 1 n ^ (n / 2) ∧
+      K 1 n ^ (n / 2) ≥ 0 :=
+  additive_lower_bound n hn h2 K hK
+
+theorem spec_convex_lower_bound (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0 : ℝ), 0 < f t)
+    (hanti : AntitoneOn f (Set.Ioi 0)) (hconv : ConvexOn ℝ (Set.Ioi 0) f) (n : ℕ) (hn : Even n)
+    (x : ℕ → ℝ) (hx : StrictMonoOn x (Set.Icc 1 n)) :
+    pfaffian (Icc 1 n) (kernel f x) ≥ f (x n - x 1) ^ (n / 2) ∧ f (x n - x 1) ^ (n / 2) > 0 :=
+  convex_lower_bound f hpos hanti hconv n hn x hx
+
+/-! ## M4 axiom guards (enabled at the M4 proof gate) -/
+
+-- /-- info: 'additive_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms additive_lower_bound
+
+-- /-- info: 'convex_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms convex_lower_bound
