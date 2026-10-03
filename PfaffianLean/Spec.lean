@@ -230,18 +230,18 @@ theorem spec_convex_kernel_additive (f : ℝ → ℝ) (hf : ∀ t ∈ Set.Ioi (0
 
 /-! ## M1 axiom guards (enabled at the M1 proof gate) -/
 
--- /-- info: 'interval_decomposition' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms interval_decomposition
+/-- info: 'interval_decomposition' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms interval_decomposition
 
--- /-- info: 'interval_decomposition_pfaffian' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms interval_decomposition_pfaffian
+/-- info: 'interval_decomposition_pfaffian' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms interval_decomposition_pfaffian
 
--- /-- info: 'interval_decomposition_corner' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms interval_decomposition_corner
+/-- info: 'interval_decomposition_corner' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms interval_decomposition_corner
 
--- /-- info: 'convex_kernel_additive' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms convex_kernel_additive
+/-- info: 'convex_kernel_additive' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms convex_kernel_additive
