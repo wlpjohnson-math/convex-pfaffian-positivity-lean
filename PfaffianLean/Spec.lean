@@ -349,10 +349,10 @@ theorem spec_convex_lower_bound (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0 :
 
 /-! ## M4 axiom guards (enabled at the M4 proof gate) -/
 
--- /-- info: 'additive_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms additive_lower_bound
+/-- info: 'additive_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms additive_lower_bound
 
--- /-- info: 'convex_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms convex_lower_bound
+/-- info: 'convex_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms convex_lower_bound
