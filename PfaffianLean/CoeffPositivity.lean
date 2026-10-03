@@ -420,4 +420,46 @@ theorem intervalPfaffian_four :
       if h : (p, q) ∈ intervals 4 then X ⟨(p, q), h⟩ else 0
     intervalPfaffian 4 = a 1 4 ^ 2 + a 1 4 * (a 1 2 + a 1 3 + a 2 3 + a 2 4 + a 3 4) +
       a 1 2 * a 3 4 + a 1 2 * a 2 4 + a 1 3 * a 3 4 := by
-  sorry
+  intro a
+  -- Each entry is the sum of `a p q` over the intervals `[p, q] ∈ I_4` containing `i` and `j`.
+  have hentry : ∀ i j, intervalMatrix 4 i j =
+      ∑ J ∈ intervals 4 with i ∈ Icc J.1 J.2 ∧ j ∈ Icc J.1 J.2, a J.1 J.2 := by
+    intro i j
+    simp only [intervalMatrix, Matrix.of_apply]
+    rw [sum_filter, sum_filter, ← sum_coe_sort (intervals 4)]
+    refine sum_congr rfl fun J _ => ?_
+    simp [a]
+  have e12 : intervalMatrix 4 1 2 = a 1 2 + a 1 3 + a 1 4 := by
+    rw [hentry, show ({J ∈ intervals 4 | 1 ∈ Icc J.1 J.2 ∧ 2 ∈ Icc J.1 J.2} : Finset (ℕ × ℕ)) =
+      {(1, 2), (1, 3), (1, 4)} by decide]
+    simp [add_assoc]
+  have e13 : intervalMatrix 4 1 3 = a 1 3 + a 1 4 := by
+    rw [hentry, show ({J ∈ intervals 4 | 1 ∈ Icc J.1 J.2 ∧ 3 ∈ Icc J.1 J.2} : Finset (ℕ × ℕ)) =
+      {(1, 3), (1, 4)} by decide]
+    simp
+  have e14 : intervalMatrix 4 1 4 = a 1 4 := by
+    rw [hentry, show ({J ∈ intervals 4 | 1 ∈ Icc J.1 J.2 ∧ 4 ∈ Icc J.1 J.2} : Finset (ℕ × ℕ)) =
+      {(1, 4)} by decide]
+    simp
+  have e23 : intervalMatrix 4 2 3 = a 1 3 + a 1 4 + a 2 3 + a 2 4 := by
+    rw [hentry, show ({J ∈ intervals 4 | 2 ∈ Icc J.1 J.2 ∧ 3 ∈ Icc J.1 J.2} : Finset (ℕ × ℕ)) =
+      {(1, 3), (1, 4), (2, 3), (2, 4)} by decide]
+    simp [add_assoc]
+  have e24 : intervalMatrix 4 2 4 = a 1 4 + a 2 4 := by
+    rw [hentry, show ({J ∈ intervals 4 | 2 ∈ Icc J.1 J.2 ∧ 4 ∈ Icc J.1 J.2} : Finset (ℕ × ℕ)) =
+      {(1, 4), (2, 4)} by decide]
+    simp
+  have e34 : intervalMatrix 4 3 4 = a 1 4 + a 2 4 + a 3 4 := by
+    rw [hentry, show ({J ∈ intervals 4 | 3 ∈ Icc J.1 J.2 ∧ 4 ∈ Icc J.1 J.2} : Finset (ℕ × ℕ)) =
+      {(1, 4), (2, 4), (3, 4)} by decide]
+    simp [add_assoc]
+  -- `F_4 = Pf = A₁₂ A₃₄ - A₁₃ A₂₄ + A₁₄ A₂₃` (eq. (2), by the first-row expansion).
+  have hpf4 : ∀ A : Matrix ℕ ℕ (MvPolynomial (intervals 4) ℤ),
+      pfaffian (Icc 1 4) A = A 1 2 * A 3 4 - A 1 3 * A 2 4 + A 1 4 * A 2 3 := by
+    intro A
+    rw [show (Icc 1 4 : Finset ℕ) = insert 1 (insert 2 (insert 3 {4})) by decide]
+    simp [pfaffian_insert_of_forall_lt, pfaffian_empty, sum_insert, filter_insert,
+      erase_insert_of_ne, filter_singleton]
+    ring
+  rw [intervalPfaffian, hpf4, e12, e13, e14, e23, e24, e34]
+  ring
