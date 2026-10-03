@@ -6,4 +6,5 @@ import PfaffianLean.ConvexKernel
 import PfaffianLean.TwinRows
 import PfaffianLean.PfaffianFacts
 import PfaffianLean.CoeffPositivity
+import PfaffianLean.LowerBounds
 import PfaffianLean.Spec
