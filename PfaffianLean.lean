@@ -3,4 +3,5 @@ import PfaffianLean.Tests
 import PfaffianLean.Families
 import PfaffianLean.IntervalDecomposition
 import PfaffianLean.ConvexKernel
+import PfaffianLean.TwinRows
 import PfaffianLean.Spec
