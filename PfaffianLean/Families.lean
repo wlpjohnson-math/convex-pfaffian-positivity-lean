@@ -49,3 +49,15 @@ noncomputable def intervalPfaffian (n : ℕ) : MvPolynomial (intervals n) ℤ :=
 /-- The kernel family `K_{f,x}(i, j) = f(x_j - x_i)`. -/
 def kernel (f : ℝ → ℝ) (x : ℕ → ℝ) : Matrix ℕ ℕ ℝ :=
   Matrix.of fun i j => f (x j - x i)
+
+/-! ### The padding -/
+
+@[simp] theorem pad_zero_left (n : ℕ) (K : Matrix ℕ ℕ ℝ) (j : ℕ) : pad n K 0 j = 0 := by
+  simp [pad]
+
+@[simp] theorem pad_succ_right (n : ℕ) (K : Matrix ℕ ℕ ℝ) (i : ℕ) : pad n K i (n + 1) = 0 := by
+  simp [pad]
+
+theorem pad_of_ne (n : ℕ) (K : Matrix ℕ ℕ ℝ) {i j : ℕ} (hi : i ≠ 0) (hj : j ≠ n + 1) :
+    pad n K i j = K i j := by
+  simp [pad, hi, hj]
