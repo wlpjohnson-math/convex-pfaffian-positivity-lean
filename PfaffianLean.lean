@@ -4,4 +4,6 @@ import PfaffianLean.Families
 import PfaffianLean.IntervalDecomposition
 import PfaffianLean.ConvexKernel
 import PfaffianLean.TwinRows
+import PfaffianLean.PfaffianFacts
+import PfaffianLean.CoeffPositivity
 import PfaffianLean.Spec
