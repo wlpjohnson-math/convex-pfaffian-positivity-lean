@@ -133,3 +133,12 @@ The `F_4` expansion is checked in `CoeffPositivity.lean`.
 | `PfaffianLean/CoeffPositivity.lean` | Coefficient positivity and the `F_4` check |
 | `PfaffianLean/LowerBounds.lean` | Additive and Convex lower bounds |
 | `PfaffianLean/Spec.lean` | Frozen statements, definition guards and axiom guards |
+
+## Verification
+
+Commits and release tags are signed with the SSH key `SHA256:rbBuGOZMBxVRlDiLsdjqGtmhfobwvKrNbBt0dQxzivU`(ed25519), whose public key is in allowed_signers. To verify:
+
+```
+git config gpg.ssh.allowedSignersFile allowed_signers
+git log --show-signature
+```
