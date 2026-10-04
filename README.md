@@ -73,13 +73,22 @@ The statements use the following conventions.
   Interval decomposition holds for every `n`, and nonnegativity and homogeneity of `F_n` hold for
   odd `n` as well, where `F_n = 0`.
 
+## How this formalization was produced
+
+The Lean code was written by Claude Opus 5.5 (Anthropic), working in Claude Code from a written
+excerpt of an early draft of the paper's proofs. The work ran in stages. At each stage, the definitions and theorem
+statements were written first, with `sorry` proofs, and reviewed by the author against the paper
+before any proof was written. Approved statements were then frozen in `Spec.lean`. The proofs
+themselves are checked by Lean. The author's review covers the definitions and statements in
+`Spec.lean`, which is what a reader needs to check to trust the result.
+
 ## Auditing
 
 [`PfaffianLean/Spec.lean`](PfaffianLean/Spec.lean) is the audit surface: it lets a reader check
 the statements without reading any proof.
 
-- Each approved statement is restated in full as a `spec_<name>` theorem, proved by direct
-  application of the project theorem.
+- Each statement approved by the author is restated in full as a `spec_<name>` theorem, proved
+  by direct application of the project theorem.
 - Each definition used in a statement is pinned by a `#guard_msgs in #print` of its current form.
 - Each theorem has a `#guard_msgs in #print axioms` guard expecting exactly
   `[propext, Classical.choice, Quot.sound]`.
@@ -89,6 +98,11 @@ following:
 - the statements are the approved ones;
 - the definitions are unchanged;
 - no other axioms are used.
+
+## What's trusted
+
+The result relies on Lean's kernel and on Mathlib's definitions of the standard notions in the
+statements (ℝ, `ConvexOn`, `AntitoneOn`, `StrictMonoOn`, `MvPolynomial`).
 
 ## Building
 
