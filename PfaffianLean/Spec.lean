@@ -19,6 +19,11 @@ The approved definitions and statements, frozen for audit.
 
 This file changes only at gates: new spec theorems and definition guards at a statement gate,
 uncommented axiom guards at a proof gate.
+
+The file also contains a final section, "Non-vacuity", showing that the hypotheses of
+`convex_lower_bound` are satisfiable: for every even `n`, its examples apply the theorem at
+concrete `f` and `x`, proving all the other hypotheses from Mathlib. Like everything else in the
+file, it changes only at gates.
 -/
 
 set_option linter.style.longLine false
@@ -356,3 +361,48 @@ theorem spec_convex_lower_bound (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0 :
 /-- info: 'convex_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms convex_lower_bound
+
+/-! ## M5 lemmas -/
+
+theorem spec_convex_lower_bound_skew (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0 : ℝ), 0 < f t)
+    (hanti : AntitoneOn f (Set.Ioi 0)) (hconv : ConvexOn ℝ (Set.Ioi 0) f) (n : ℕ) (hn : Even n)
+    (x : ℕ → ℝ) (hx : StrictMonoOn x (Set.Icc 1 n)) :
+    pfaffian (Icc 1 n) (skewExtension (kernel f x)) ≥ f (x n - x 1) ^ (n / 2) ∧
+      f (x n - x 1) ^ (n / 2) > 0 :=
+  convex_lower_bound_skew f hpos hanti hconv n hn x hx
+
+/-! ## M5 axiom guards -/
+
+/-- info: 'convex_lower_bound_skew' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms convex_lower_bound_skew
+
+/-! ## Non-vacuity
+
+The hypotheses of `convex_lower_bound` are satisfiable. Each example discharges all of them from
+Mathlib for a concrete `f` and `x`, assuming only `Even n`. -/
+
+/-- Satisfiability check: the hypotheses of `convex_lower_bound` hold for `f = 1`, `x k = k`. -/
+example (n : ℕ) (hn : Even n) :
+    pfaffian (Icc 1 n) (kernel (fun _ => (1 : ℝ)) (fun k => (k : ℝ))) ≥ (1 : ℝ) ^ (n / 2) ∧
+      (1 : ℝ) ^ (n / 2) > 0 := by
+  have hpos : ∀ t ∈ Set.Ioi (0 : ℝ), 0 < (fun _ : ℝ => (1 : ℝ)) t := fun _ _ => one_pos
+  have hanti : AntitoneOn (fun _ : ℝ => (1 : ℝ)) (Set.Ioi 0) := fun _ _ _ _ _ => le_rfl
+  have hconv : ConvexOn ℝ (Set.Ioi 0) (fun _ : ℝ => (1 : ℝ)) := convexOn_const 1 (convex_Ioi 0)
+  have hx : StrictMonoOn (fun k : ℕ => (k : ℝ)) (Set.Icc 1 n) := fun a _ b _ hab =>
+    show (a : ℝ) < b from Nat.cast_lt.2 hab
+  exact convex_lower_bound (fun _ => 1) hpos hanti hconv n hn (fun k => (k : ℝ)) hx
+
+/-- Satisfiability check: the hypotheses of `convex_lower_bound` hold for `f t = t⁻¹`, which
+blows up at `0`, and `x k = k`. -/
+example (n : ℕ) (hn : Even n) :
+    pfaffian (Icc 1 n) (kernel (fun t => t⁻¹) (fun k => (k : ℝ))) ≥ ((n : ℝ) - 1)⁻¹ ^ (n / 2) ∧
+      ((n : ℝ) - 1)⁻¹ ^ (n / 2) > 0 := by
+  have hpos : ∀ t ∈ Set.Ioi (0 : ℝ), 0 < (fun t : ℝ => t⁻¹) t := fun _ ht => inv_pos.2 ht
+  have hanti : AntitoneOn (fun t : ℝ => t⁻¹) (Set.Ioi 0) := inv_antitoneOn_Ioi
+  have hconv : ConvexOn ℝ (Set.Ioi 0) (fun t : ℝ => t⁻¹) := by
+    simpa only [zpow_neg_one] using convexOn_zpow (𝕜 := ℝ) (-1)
+  have hx : StrictMonoOn (fun k : ℕ => (k : ℝ)) (Set.Icc 1 n) := fun a _ b _ hab =>
+    show (a : ℝ) < b from Nat.cast_lt.2 hab
+  simpa only [Nat.cast_one] using
+    convex_lower_bound (fun t => t⁻¹) hpos hanti hconv n hn (fun k => (k : ℝ)) hx

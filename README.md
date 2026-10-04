@@ -23,6 +23,11 @@ theorem convex_lower_bound (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0 : ℝ)
     pfaffian (Icc 1 n) (kernel f x) ≥ f (x n - x 1) ^ (n / 2) ∧ f (x n - x 1) ^ (n / 2) > 0
 ```
 
+`kernel f x` is the family `f(x_j − x_i)` over all `i, j`, and is not itself skew-symmetric.
+Since `pfaffian` reads only the entries with `i < j`, the statement is about `Pf A_f(x)`.
+`convex_lower_bound_skew` states the same bound for the skew-symmetric matrix
+`skewExtension (kernel f x)`.
+
 The case `n = 0` is included; there both sides equal `1`.
 
 ## Results
@@ -41,6 +46,7 @@ The case `n = 0` is included; there both sides equal `1`.
 | The `F_4` check | `intervalPfaffian_four` | `CoeffPositivity.lean` |
 | Additive lower bound | `additive_lower_bound` | `LowerBounds.lean` |
 | Convex lower bound | `convex_lower_bound` | `LowerBounds.lean` |
+| Convex lower bound, skew-symmetric form | `convex_lower_bound_skew` | `LowerBounds.lean` |
 
 The main proofs are written as named `have` steps, each commented with the step of the argument
 it proves.
@@ -92,17 +98,37 @@ the statements without reading any proof.
 - Each definition used in a statement is pinned by a `#guard_msgs in #print` of its current form.
 - Each theorem has a `#guard_msgs in #print axioms` guard expecting exactly
   `[propext, Classical.choice, Quot.sound]`.
+- A final "Non-vacuity" section shows the hypotheses of `convex_lower_bound` are satisfiable:
+  for every even `n`, it applies the theorem with `x k = k` to `f = 1` and to `f t = t⁻¹` (which
+  blows up at `0`), proving all the other hypotheses from Mathlib.
 
 `Spec.lean` is imported by the root module, so a successful `lake build` certifies all of the
 following:
-- the statements are the approved ones;
-- the definitions are unchanged;
+- the project's theorems prove exactly the statements in `Spec.lean`;
+- the definitions match their pinned forms;
 - no other axioms are used.
+
+That `Spec.lean` is the reviewed version is recorded by the signed commit history (see
+[Verification](#verification)).
+
+The definition of `pfaffian` can also be checked without relying on the crossing-number formula.
+`spec_pfaffian_empty` and `spec_pfaffian_insert_of_forall_lt` together determine `pfaffian` on
+every finite set, by induction on its size, removing the minimum each time. For `S = [n]`, the
+term in which `1` is matched to `j` has sign `(−1)^(j−2) = (−1)^j`, which is the standard
+first-row expansion. So a reader can check the definition either directly or through these two
+lemmas.
 
 ## What's trusted
 
-The result relies on Lean's kernel and on Mathlib's definitions of the standard notions in the
-statements (ℝ, `ConvexOn`, `AntitoneOn`, `StrictMonoOn`, `MvPolynomial`).
+The result relies on three things:
+- Lean's kernel.
+- Mathlib's definitions of the standard notions in the statements: ℝ, `ConvexOn`, `AntitoneOn`,
+  `StrictMonoOn`, `Even`, `Finset`, `Set.Icc`, `Matrix` and `MvPolynomial`. `MvPolynomial` is
+  used only in the intermediate statements.
+- The project definitions pinned in `Spec.lean`. The main theorem uses only five of them:
+  `edges`, `perfectMatchings`, `crossings`, `pfaffian` and `kernel`, plus `skewExtension` for the
+  skew form. `intervals`, `pad`, `alpha`, `additiveClass`, `intervalMatrix` and
+  `intervalPfaffian` appear only in intermediate statements.
 
 ## Building
 
@@ -115,6 +141,7 @@ lake build
 
 Sanity tests are in `PfaffianLean/Tests.lean`:
 - the `n = 2` and `n = 4` formulas;
+- the value `418` for the skew matrix with `A_ij = 10i + j` for `i < j`, evaluated by `#guard`;
 - `Pf(𝒯_n) = 1` at `n = 2, 4, 6`.
 
 The `F_4` expansion is checked in `CoeffPositivity.lean`.
@@ -124,7 +151,7 @@ The `F_4` expansion is checked in `CoeffPositivity.lean`.
 | File | Contents |
 |---|---|
 | `PfaffianLean/Pfaffian.lean` | Definition of the Pfaffian; evaluation lemma; first-row expansion |
-| `PfaffianLean/Tests.lean` | Sanity tests for the definition |
+| `PfaffianLean/Tests.lean` | Sanity tests for the definition, including a `#guard` evaluation |
 | `PfaffianLean/Families.lean` | Families, mixed differences, the additive class, `F_n`, `K_{f,x}` |
 | `PfaffianLean/IntervalDecomposition.lean` | Interval decomposition |
 | `PfaffianLean/ConvexKernel.lean` | Additivity of convex kernels |
@@ -132,11 +159,11 @@ The `F_4` expansion is checked in `CoeffPositivity.lean`.
 | `PfaffianLean/PfaffianFacts.lean` | `Pf(cA)`, reindexing, zero rows, `Pf(𝒯_n) = 1` |
 | `PfaffianLean/CoeffPositivity.lean` | Coefficient positivity and the `F_4` check |
 | `PfaffianLean/LowerBounds.lean` | Additive and Convex lower bounds |
-| `PfaffianLean/Spec.lean` | Frozen statements, definition guards and axiom guards |
+| `PfaffianLean/Spec.lean` | Frozen statements, definition guards, axiom guards and non-vacuity examples |
 
 ## Verification
 
-Commits and release tags are signed with the SSH key `SHA256:rbBuGOZMBxVRlDiLsdjqGtmhfobwvKrNbBt0dQxzivU`(ed25519), whose public key is in allowed_signers. To verify:
+Commits and release tags are signed with the SSH key `SHA256:rbBuGOZMBxVRlDiLsdjqGtmhfobwvKrNbBt0dQxzivU` (ed25519), whose public key is in `allowed_signers`. To verify:
 
 ```
 git config gpg.ssh.allowedSignersFile allowed_signers

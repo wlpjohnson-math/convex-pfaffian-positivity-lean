@@ -77,3 +77,13 @@ theorem convex_lower_bound (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0 : ℝ)
   refine ⟨?_, pow_pos (hpos _ hgap) _⟩
   rw [hpf, ← hK1n]
   exact hge
+
+/-- **Convex lower bound**, skew-symmetric form: the same bound for the skew-symmetric matrix
+`A_f(x)` with `A_ij = f(x_j - x_i)` for `i < j`. -/
+theorem convex_lower_bound_skew (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0 : ℝ), 0 < f t)
+    (hanti : AntitoneOn f (Set.Ioi 0)) (hconv : ConvexOn ℝ (Set.Ioi 0) f) (n : ℕ) (hn : Even n)
+    (x : ℕ → ℝ) (hx : StrictMonoOn x (Set.Icc 1 n)) :
+    pfaffian (Icc 1 n) (skewExtension (kernel f x)) ≥ f (x n - x 1) ^ (n / 2) ∧
+      f (x n - x 1) ^ (n / 2) > 0 := by
+  rw [pfaffian_skewExtension]
+  exact convex_lower_bound f hpos hanti hconv n hn x hx
