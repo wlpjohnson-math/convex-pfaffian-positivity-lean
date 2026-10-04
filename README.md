@@ -1,7 +1,6 @@
 # pfaffian-lean
 
-A Lean 4 + Mathlib formalization of a positivity theorem for Pfaffians of convex nonincreasing
-kernels, following the note excerpted in [`refs/pfaffian-convex.tex`](refs/pfaffian-convex.tex).
+A Lean 4 + Mathlib formalization of a positivity theorem for Pfaffians of convex nonincreasing kernels.
 
 The formalization is complete: there is no `sorry`, and every result in
 [`PfaffianLean/Spec.lean`](PfaffianLean/Spec.lean) depends only on the axioms `propext`,
@@ -26,14 +25,14 @@ theorem convex_lower_bound (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0 : ℝ)
 
 The case `n = 0` is included; there both sides equal `1`.
 
-## From the reference to Lean
+## Results
 
-| Reference | Lean | File |
+| Result | Lean | File |
 |---|---|---|
-| Pfaffian as a signed sum over perfect matchings (eq. (1)) | `pfaffian`, `perfectMatchings`, `crossings`, `edges` | `Pfaffian.lean` |
+| Pfaffian as a signed sum over perfect matchings | `pfaffian`, `perfectMatchings`, `crossings`, `edges` | `Pfaffian.lean` |
 | Evaluation lemma (Pf commutes with ring homs) | `RingHom.map_pfaffian` | `Pfaffian.lean` |
 | First-row expansion | `pfaffian_insert_of_forall_lt` | `Pfaffian.lean` |
-| Families, `α`, `I_n`, `𝒜_n`, `F_n`, `K_{f,x}` (Definitions 2.1, 2.2) | `intervals`, `pad`, `alpha`, `additiveClass`, `intervalMatrix`, `intervalPfaffian`, `kernel` | `Families.lean` |
+| Families, `α`, `I_n`, `𝒜_n`, `F_n`, `K_{f,x}` | `intervals`, `pad`, `alpha`, `additiveClass`, `intervalMatrix`, `intervalPfaffian`, `kernel` | `Families.lean` |
 | Twin rows | `pf_twin_rows`, and the general form `pf_twin_rows_consecutive` | `TwinRows.lean` |
 | Interval decomposition | `interval_decomposition`, `interval_decomposition_pfaffian`, `interval_decomposition_corner` | `IntervalDecomposition.lean` |
 | Additivity of convex kernels | `convex_kernel_additive` | `ConvexKernel.lean` |
@@ -43,25 +42,26 @@ The case `n = 0` is included; there both sides equal `1`.
 | Additive lower bound | `additive_lower_bound` | `LowerBounds.lean` |
 | Convex lower bound | `convex_lower_bound` | `LowerBounds.lean` |
 
-The main proofs are written as named `have` steps that follow the paragraphs of the reference,
-with comments quoting the sentence each step proves.
+The main proofs are written as named `have` steps, each commented with the step of the argument
+it proves.
 
 ## Conventions
 
-These are the places where the Lean statements differ in form from the reference.
+The statements use the following conventions.
 
 - **Index sets.** The Pfaffian is defined on any finite set `S` of a linearly ordered type:
   `pfaffian S A` is the Pfaffian of the principal submatrix of `A` on `S`, in increasing order.
-  The reference's `[n]` is `Finset.Icc 1 n`, and deleting rows and columns is set difference, so
-  no reindexing is needed. Where the reference reindexes (the map `φ` in Coefficient positivity),
-  the proof uses `pfaffian_image_strictMono`.
+  `[n] = {1, …, n}` is `Finset.Icc 1 n`, and deleting rows and columns is set difference, so no
+  reindexing is needed. Where a proof does reindex (the map `φ` in Coefficient positivity), it
+  uses `pfaffian_image_strictMono`.
 - **Upper entries only.** `pfaffian` reads only the entries `A a b` with `a < b`. For a
-  skew-symmetric matrix this is exactly eq. (1); for a family `K` it is the Pfaffian of the skew
-  extension (`pfaffian_skewExtension`). For odd `|S|` the Pfaffian is `0`.
+  skew-symmetric matrix this is the usual signed sum over perfect matchings; for a family `K` it
+  is the Pfaffian of the skew extension (`pfaffian_skewExtension`). For odd `|S|` the Pfaffian
+  is `0`.
 - **Twin rows.** The twin hypothesis is stated on upper entries: `A y z = A y' z` for `z > y'`
-  and `A z y = A z y'` for `z < y`. For a skew-symmetric matrix this is the reference's row
-  condition.
-- **Padding.** The mixed differences `alpha n K` insert the reference's convention
+  and `A z y = A z y'` for `z < y`. For a skew-symmetric matrix this says that rows `y` and `y'`
+  agree outside columns `y` and `y'`.
+- **Padding.** The mixed differences `alpha n K` insert the convention
   `K(0, j) = K(i, n + 1) = 0` explicitly (`pad`), instead of reading row `0` and column `n + 1`
   of `K`.
 - **`F_n`.** `intervalPfaffian n` lives in `MvPolynomial (intervals n) ℤ`, with exactly one
@@ -69,9 +69,9 @@ These are the places where the Lean statements differ in form from the reference
   `MvPolynomial.aeval`.
 - **`f` and `x`.** `f : ℝ → ℝ`, with every hypothesis restricted to `Set.Ioi 0`, and
   `x : ℕ → ℝ`, required to be strictly increasing on `Icc 1 n` only.
-- **Generality.** Some statements drop hypotheses the reference carries but the result doesn't
-  need. For example, Interval decomposition holds for every `n`, and nonnegativity and
-  homogeneity of `F_n` hold for odd `n` as well, where `F_n = 0`.
+- **Generality.** Some statements are proved without hypotheses they don't need. For example,
+  Interval decomposition holds for every `n`, and nonnegativity and homogeneity of `F_n` hold for
+  odd `n` as well, where `F_n = 0`.
 
 ## Auditing
 
@@ -119,8 +119,6 @@ The `F_4` expansion is checked in `CoeffPositivity.lean`.
 | `PfaffianLean/CoeffPositivity.lean` | Coefficient positivity and the `F_4` check |
 | `PfaffianLean/LowerBounds.lean` | Additive and Convex lower bounds |
 | `PfaffianLean/Spec.lean` | Frozen statements, definition guards and axiom guards |
-| `refs/pfaffian-convex.tex` | The reference excerpt |
-| `PROMPT.md` | The task specification the formalization was built against |
 
 ## GitHub configuration
 

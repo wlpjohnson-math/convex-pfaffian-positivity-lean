@@ -3,15 +3,13 @@ import PfaffianLean.Pfaffian
 /-!
 # Families, mixed differences, the additive class and the interval model
 
-Reference: `refs/pfaffian-convex.tex`, Definitions 2.1 and 2.2.
-
 A family of reals on `[n] = {1, …, n}` is a matrix `K : Matrix ℕ ℕ ℝ`, of which only the entries
 `K i j` with `1 ≤ i < j ≤ n` matter: its Pfaffian is `pfaffian (Icc 1 n) K`, the Pfaffian of
-its skew extension on `[n]` (`pfaffian_skewExtension`). Entries outside `[n]` are real entries of
-the matrix, not the reference's padding, so the mixed differences `alpha n K` insert the padding
-`K(0, j) = 0`, `K(i, n + 1) = 0` explicitly (`pad`).
+its skew extension on `[n]` (`pfaffian_skewExtension`). Entries outside `[n]` are genuine entries
+of the matrix, so the mixed differences `alpha n K` insert the padding convention `K(0, j) = 0`,
+`K(i, n + 1) = 0` explicitly (`pad`) instead of reading them.
 
-An interval `[p, q]` is written as the pair `(p, q)`. The polynomial `F_n` of the reference is
+An interval `[p, q]` is written as the pair `(p, q)`. The polynomial `F_n` is
 `intervalPfaffian n`, with one variable for each interval `J ∈ I_n` (the variable type is the
 subtype of `intervals n`).
 -/
@@ -22,7 +20,7 @@ open Finset MvPolynomial
 def intervals (n : ℕ) : Finset (ℕ × ℕ) :=
   {J ∈ Icc 1 n ×ˢ Icc 1 n | J.1 < J.2}
 
-/-- The family `K` with the reference's padding convention `K(0, j) = 0` and `K(i, n + 1) = 0`;
+/-- The family `K` with the padding convention `K(0, j) = 0` and `K(i, n + 1) = 0`;
 all other entries are those of `K`. -/
 def pad (n : ℕ) (K : Matrix ℕ ℕ ℝ) (i j : ℕ) : ℝ :=
   if i = 0 ∨ j = n + 1 then 0 else K i j

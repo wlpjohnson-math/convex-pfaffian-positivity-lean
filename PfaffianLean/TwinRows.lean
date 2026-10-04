@@ -3,17 +3,15 @@ import PfaffianLean.Pfaffian
 /-!
 # The Twin rows lemma
 
-Reference: `refs/pfaffian-convex.tex`, Section 3, Lemma (Twin rows).
-
 If two consecutive rows `y < y'` of `S` are twins, then
 `Pf_S A = A_{y y'} · Pf_{S ∖ {y, y'}} A`.
 
 Since `pfaffian` reads only the entries `A a b` with `a < b`, the twin condition is stated on
 those entries: `A y z = A y' z` for `z ∈ S` with `z > y'`, and `A z y = A z y'` for `z ∈ S` with
-`z < y`. For a skew-symmetric `A` this is the reference's condition `A_{y,z} = A_{y+1,z}` for all
-`z ∉ {y, y+1}`.
+`z < y`. For a skew-symmetric `A` this is the row condition `A_{y,z} = A_{y',z}` for all
+`z ∉ {y, y'}`.
 
-The proof is the reference's: the partner swap `M ↦ M'` (exchange the partners of `y` and `y'`)
+Proof: the partner swap `M ↦ M'` (exchange the partners of `y` and `y'`)
 is a weight-preserving, fixed-point-free involution on the matchings not containing `(y, y')`
 that changes the crossing number by an odd amount, so those terms cancel; the matchings
 containing `(y, y')` give `A_{y y'} · Pf_{S ∖ {y, y'}} A`.
@@ -162,7 +160,7 @@ theorem map_partnerSwap_mem {M : Finset (ι × ι)} (hM : M ∈ perfectMatchings
     exact lt_asymm hyy' h12
 
 omit [CommRing R] hy hy' in
-/-- "The weight of an edge `{y, u}` equals the weight of the edge `{y', u}`": the partner swap
+/-- The weight of an edge `{y, u}` equals the weight of the edge `{y', u}`: the partner swap
 preserves the weight of every edge of a perfect matching of `S` not containing `(y, y')`. -/
 theorem weight_partnerSwap (A : Matrix ι ι R) (htwin_right : ∀ z ∈ S, y' < z → A y z = A y' z)
     (htwin_left : ∀ z ∈ S, z < y → A z y = A z y') {M : Finset (ι × ι)}
@@ -192,8 +190,8 @@ theorem weight_partnerSwap (A : Matrix ι ι R) (htwin_right : ∀ z ∈ S, y' <
     exact htwin_left _ h1 this
   rw [Equiv.swap_apply_of_ne_of_ne hy2 hy'2]
 
-/-- "It changes the crossing number by an odd amount": for a perfect matching `M` of `S` not
-containing `(y, y')`, `cr(M) + cr(M')` is odd, where `M'` is the partner swap of `M`. -/
+/-- The partner swap changes the crossing number by an odd amount: for a perfect matching `M` of
+`S` not containing `(y, y')`, `cr(M) + cr(M')` is odd, where `M'` is the partner swap of `M`. -/
 theorem odd_crossings_add_crossings_partnerSwap {M : Finset (ι × ι)}
     (hM : M ∈ perfectMatchings S) (he₀ : (y, y') ∉ M) :
     Odd (crossings M + crossings (M.map (partnerSwap y y').toEmbedding)) := by
@@ -240,7 +238,7 @@ theorem odd_crossings_add_crossings_partnerSwap {M : Finset (ι × ι)}
     have i3 := swap_lt_swap_iff hyy' hcons he2 hf2 (hef _ _ (Or.inr rfl) (Or.inr rfl)).1
       (hef _ _ (Or.inr rfl) (Or.inr rfl)).2
     simp only [hc, σ, partnerSwap_apply, i1, i2, i3]
-  -- "Between the two edges themselves, exactly one of `M`, `M'` has a crossing."
+  -- Between the two edges themselves, exactly one of `M`, `M'` has a crossing.
   have hpair : c a b + c (σ a) (σ b) + (c b a + c (σ b) (σ a)) = 1 := by
     have hay' : a.1 ≠ y' ∧ a.2 ≠ y' := ⟨fun h => hab (hb_uniq a haM.1 (Or.inl h)),
       fun h => hab (hb_uniq a haM.1 (Or.inr h))⟩
@@ -295,9 +293,9 @@ theorem pf_twin_rows_consecutive {S : Finset ι} (A : Matrix ι ι R) {y y' : ι
   set σ := partnerSwap y y'
   -- Split the matchings according to whether they contain the edge `(y, y')`.
   rw [pfaffian, ← sum_filter_add_sum_filter_not _ (fun M => (y, y') ∈ M)]
-  -- "Matchings not containing `{y, y+1}`": the partner swap `M ↦ M'` is an involution without
-  -- fixed points on them, it preserves the weight and changes the crossing number by an odd
-  -- amount, "so the terms of `M` and `M'` cancel".
+  -- Matchings not containing `(y, y')`: the partner swap `M ↦ M'` is an involution without
+  -- fixed points on them; it preserves the weight and changes the crossing number by an odd
+  -- amount, so the terms of `M` and `M'` cancel.
   have hcancel : ∑ M ∈ perfectMatchings S with (y, y') ∉ M,
       (-1) ^ crossings M * ∏ e ∈ M, A e.1 e.2 = 0 := by
     refine sum_involution (fun M _ => M.map σ.toEmbedding) (fun M hM => ?_) (fun M hM _ => ?_)
@@ -330,8 +328,8 @@ theorem pf_twin_rows_consecutive {S : Finset ι} (A : Matrix ι ι R) {y y' : ι
       convert map_refl (s := M)
       ext e : 1
       simp [σ]
-  -- "Matchings containing `{y, y+1}`": the edge `(y, y')` crosses no other edge, "and these terms
-  -- sum to `A_{y,y+1} Pf(A_{[n] ∖ {y,y+1}})`".
+  -- Matchings containing `(y, y')`: this edge crosses no other edge, so these terms sum to
+  -- `A_{y y'} · Pf_{S ∖ {y, y'}} A`.
   have hcontain : ∑ M ∈ perfectMatchings S with (y, y') ∈ M,
       (-1) ^ crossings M * ∏ e ∈ M, A e.1 e.2 = A y y' * pfaffian (S \ {y, y'}) A := by
     rw [sum_perfectMatchings_filter_mem hy hy' hyy', pfaffian, mul_sum]
@@ -354,7 +352,7 @@ theorem pf_twin_rows_consecutive {S : Finset ι} (A : Matrix ι ι R) {y y' : ι
     ring
   rw [hcancel, hcontain, add_zero]
 
-/-- **Twin rows**, the reference's form: rows `y` and `y + 1` of `[n]`. -/
+/-- **Twin rows** for the rows `y` and `y + 1` of `[n]`. -/
 theorem pf_twin_rows (n : ℕ) (A : Matrix ℕ ℕ R) {y : ℕ} (hy : 1 ≤ y) (hyn : y + 1 ≤ n)
     (htwin_right : ∀ z ∈ Icc 1 n, y + 1 < z → A y z = A (y + 1) z)
     (htwin_left : ∀ z ∈ Icc 1 n, z < y → A z y = A z (y + 1)) :

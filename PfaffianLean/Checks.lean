@@ -18,3 +18,5 @@ example (n : ℕ) (hn : Even n) :
   exact convex_lower_bound (fun _ => 1) hpos hanti hconv n hn (fun k => (k : ℝ)) hx
 
 #check @convex_lower_bound
+
+#print axioms convex_lower_bound

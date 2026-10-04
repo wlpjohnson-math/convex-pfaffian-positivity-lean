@@ -5,13 +5,11 @@ import PfaffianLean.PfaffianFacts
 /-!
 # Coefficient positivity
 
-Reference: `refs/pfaffian-convex.tex`, Section 3, Theorem (Coefficient positivity).
-
 For every `n`, `F_n` (`intervalPfaffian n`) has nonnegative integer coefficients, it is
 homogeneous of degree `n / 2`, and for even `n ≥ 2` the coefficient of `a_[1,n]^(n/2)` is `1`.
 We also check the expansion of `F_4`.
 
-## Proof outline (following the reference)
+## Proof outline
 
 * Homogeneity: every term of the matching expansion is a product of `n / 2` entries, each a sum
   of variables.
@@ -34,10 +32,10 @@ theorem corner_mem_intervals {n : ℕ} (hn : 2 ≤ n) : (1, n) ∈ intervals n :
 
 /-- **Coefficient positivity**, homogeneity: `F_n` is homogeneous of degree `n / 2`. -/
 theorem intervalPfaffian_isHomogeneous (n : ℕ) : (intervalPfaffian n).IsHomogeneous (n / 2) := by
-  -- "Every entry of the matrix is a `ℤ`-linear form in the `a_J`".
+  -- Every entry of the matrix is a `ℤ`-linear form in the `a_J`,
   have hentry : ∀ i j, (intervalMatrix n i j).IsHomogeneous 1 := fun i j =>
     IsHomogeneous.sum _ _ _ fun J _ => isHomogeneous_X ℤ J
-  -- "and every term of the matching expansion is a product of `n/2` entries."
+  -- and every term of the matching expansion is a product of `n/2` entries.
   refine IsHomogeneous.sum _ _ _ fun M hM => ?_
   have hcard : #M = n / 2 := by
     have := PerfectMatching.two_mul_card hM
@@ -129,7 +127,7 @@ theorem coeff_aeval_restrict {σ : Type*} [DecidableEq σ] (T : Finset σ) (p : 
     · rw [ite_eq_right hi, mul_zero, ite_eq_right fun h => hi (hμ h)]
       simp
 
-/-- "The coefficient of `a^μ` in `F_n` equals its coefficient in `F^S`" when the support of `μ`
+/-- The coefficient of `a^μ` in `F_n` equals its coefficient in `F^S` when the support of `μ`
 is contained in `S`. -/
 theorem coeff_intervalPfaffian_eq_restricted (n : ℕ) (T : Finset (intervals n))
     (μ : intervals n →₀ ℕ) (hμ : μ.support ⊆ T) :
@@ -149,12 +147,12 @@ theorem coeff_intervalPfaffian_eq_restricted (n : ℕ) (T : Finset (intervals n)
     split_ifs <;> rfl
   rw [hFT, coeff_aeval_restrict T _ μ hμ]
 
-/-- Case (i): "If some point `y` of `[n]` lies in no `J ∈ S`, then row `y` of `A^S` is zero" and
+/-- Case (i): if some point `y` of `[n]` lies in no `J ∈ S`, then row `y` of `A^S` is zero and
 `F^S = 0`. -/
 theorem restricted_eq_zero_of_uncovered (n : ℕ) (T : Finset (intervals n)) {y : ℕ}
     (hy : y ∈ Icc 1 n) (hunc : ∀ J ∈ T, y ∉ Icc J.1.1 J.1.2) :
     pfaffian (Icc 1 n) (restrictedMatrix n T) = 0 := by
-  -- "Every perfect matching uses an entry of that row, so `F^S = 0`."
+  -- Every perfect matching uses an entry of that row, so `F^S = 0`.
   refine pfaffian_eq_zero_of_row hy (fun z _ _ => ?_) (fun z _ _ => ?_)
   · exact sum_eq_zero fun J hJ => absurd (mem_filter.1 hJ).2.1 (hunc J (mem_filter.1 hJ).1)
   · exact sum_eq_zero fun J hJ => absurd (mem_filter.1 hJ).2.2 (hunc J (mem_filter.1 hJ).1)
@@ -169,14 +167,14 @@ theorem exists_uncut_gap (n : ℕ) (hn : 2 ≤ n) (T : Finset (intervals n)) (hT
     ∃ y ∈ Icc 1 (n - 1), ∀ J ∈ T, J.1.2 ≠ y ∧ J.1.1 ≠ y + 1 := by
   by_contra hall
   push Not at hall
-  -- The gaps cut by `J = [p, q]`: "the gap `q` (if `q ≤ n - 1`) and the gap `p - 1` (if `p ≥ 2`)".
+  -- The gaps cut by `J = [p, q]`: the gap `q` (if `q ≤ n - 1`) and the gap `p - 1` (if `p ≥ 2`).
   set cuts : intervals n → Finset ℕ := fun J => {y ∈ Icc 1 (n - 1) | J.1.2 = y ∨ J.1.1 = y + 1}
   set w : intervals n → ℕ := fun J => (if J.1.1 = 1 then 0 else 1) + (if J.1.2 = n then 0 else 1)
   have hJ : ∀ J : intervals n, 1 ≤ J.1.1 ∧ J.1.1 < J.1.2 ∧ J.1.2 ≤ n := fun J => by
     have := J.2
     simp only [intervals, mem_filter, mem_product, mem_Icc] at this
     omega
-  -- "Each `J` cuts at most two gaps", at most one if `p = 1` or `q = n`, none if `J = [1, n]`.
+  -- Each `J` cuts at most two gaps, at most one if `p = 1` or `q = n`, none if `J = [1, n]`.
   have hcuts : ∀ J, #(cuts J) ≤ w J := by
     intro J
     obtain ⟨h1, h12, h2⟩ := hJ J
@@ -188,7 +186,7 @@ theorem exists_uncut_gap (n : ℕ) (hn : 2 ≤ n) (T : Finset (intervals n)) (hT
     refine (card_le_card hsub).trans ((card_union_le _ _).trans ?_)
     simp only [w]
     split_ifs <;> simp [add_comm]
-  -- Every gap is cut ("by contradiction"), so `n - 1 ≤ ∑_J #cuts(J)`.
+  -- If every gap were cut, then `n - 1 ≤ ∑_J #cuts(J)`.
   have hcover : Icc 1 (n - 1) ⊆ T.biUnion cuts := by
     intro y hy
     obtain ⟨J, hJT, hJy⟩ := hall y hy
@@ -196,8 +194,8 @@ theorem exists_uncut_gap (n : ℕ) (hn : 2 ≤ n) (T : Finset (intervals n)) (hT
   have hle : n - 1 ≤ ∑ J ∈ T, w J := by
     have := (card_le_card hcover).trans (card_biUnion_le.trans (sum_le_sum fun J _ => hcuts J))
     simpa using this
-  -- "The point `1` lies in some `J ∈ S`, which then has `p = 1`"; "the point `n` lies in some
-  -- `J' ∈ S`, which has `q = n`". Hence `∑_J w(J) ≤ 2 |S| - 2`.
+  -- The point `1` lies in some `J ∈ S`, which then has `p = 1`, and the point `n` lies in some
+  -- `J' ∈ S`, which has `q = n`. Hence `∑_J w(J) ≤ 2 |S| - 2`.
   obtain ⟨J₁, hJ₁, h1J₁⟩ := hcov 1 (mem_Icc.2 ⟨le_rfl, by omega⟩)
   obtain ⟨Jn, hJn, hnJn⟩ := hcov n (mem_Icc.2 ⟨by omega, le_rfl⟩)
   have hp1 : J₁.1.1 = 1 := by
@@ -216,7 +214,7 @@ theorem exists_uncut_gap (n : ℕ) (hn : 2 ≤ n) (T : Finset (intervals n)) (hT
     omega
   have hA : 1 ≤ #{J ∈ T | J.1.1 = 1} := card_pos.2 ⟨J₁, mem_filter.2 ⟨hJ₁, hp1⟩⟩
   have hB : 1 ≤ #{J ∈ T | J.1.2 = n} := card_pos.2 ⟨Jn, mem_filter.2 ⟨hJn, hqn⟩⟩
-  -- "Hence at most `2|S| - 2 ≤ n - 2` of the `n - 1` gaps are cut."
+  -- Hence at most `2|S| - 2 ≤ n - 2` of the `n - 1` gaps are cut.
   omega
 
 /-- The endpoints of `φ(J ∖ {y, y + 1})` for an interval `J = [p, q]` not cut at `y`, where
@@ -226,7 +224,7 @@ first coordinate `≥` second, so it is not in `I_{n-2}`. -/
 def collapse (y : ℕ) (J : ℕ × ℕ) : ℕ × ℕ :=
   (if J.1 ≤ y then J.1 else J.1 - 2, if J.2 < y then J.2 else J.2 - 2)
 
-/-- "The reduced Pfaffian": if the gap `y` is cut by no `J ∈ S`, then
+/-- The reduced Pfaffian: if the gap `y` is cut by no `J ∈ S`, then
 `F^S = s · F_{n-2}(b)`, with `s = ∑_{J ∈ S, J ∋ y} a_J` and
 `b_{J'} = ∑_{J ∈ S, φ(J ∖ {y, y+1}) = J'} a_J`. -/
 theorem restricted_eq_mul_aeval {n : ℕ} (hn : 2 ≤ n) (T : Finset (intervals n)) {y : ℕ}
@@ -242,9 +240,9 @@ theorem restricted_eq_mul_aeval {n : ℕ} (hn : 2 ≤ n) (T : Finset (intervals 
     have := J.2
     simp only [intervals, mem_filter, mem_product, mem_Icc] at this
     omega
-  -- "For every `J ∈ S`, then, `y` lies in `J` iff `y + 1` lies in `J`. So for every
-  -- `z ∉ {y, y+1}` the `(y, z)` and `(y+1, z)` entries of `A^S` are the same sum." By the
-  -- Twin rows lemma, `F^S = s · Pf(A^S_{[n] ∖ {y, y+1}})`.
+  -- For every `J ∈ S`, `y` lies in `J` iff `y + 1` lies in `J`, so for every `z ∉ {y, y+1}`
+  -- the `(y, z)` and `(y+1, z)` entries of `A^S` are the same sum. By the Twin rows lemma,
+  -- `F^S = s · Pf(A^S_{[n] ∖ {y, y+1}})`.
   have htwin := pf_twin_rows n (restrictedMatrix n T) hy.1 (by omega)
     (fun z _ hz => by
       simp only [restrictedMatrix, Matrix.of_apply]
@@ -260,7 +258,7 @@ theorem restricted_eq_mul_aeval {n : ℕ} (hn : 2 ≤ n) (T : Finset (intervals 
       have := huncut J hJT
       simp only [mem_Icc]
       omega)
-  -- "`s := A^S_{y,y+1} = ∑_{J ∈ S, J ∋ y} a_J`."
+  -- `s := A^S_{y,y+1} = ∑_{J ∈ S, J ∋ y} a_J`.
   have hs : restrictedMatrix n T y (y + 1) = ∑ J ∈ T with y ∈ Icc J.1.1 J.1.2, X J := by
     simp only [restrictedMatrix, Matrix.of_apply]
     refine sum_congr (filter_congr fun J hJT => ?_) fun _ _ => rfl
@@ -269,8 +267,8 @@ theorem restricted_eq_mul_aeval {n : ℕ} (hn : 2 ≤ n) (T : Finset (intervals 
     omega
   rw [htwin, hs]
   congr 1
-  -- "The reduced Pfaffian. Let `φ` be the increasing bijection of `[n] ∖ {y, y+1}` onto
-  -- `[n - 2]`": we reindex along its inverse `ψ`.
+  -- The reduced Pfaffian. Let `φ` be the increasing bijection of `[n] ∖ {y, y+1}` onto
+  -- `[n - 2]`; we reindex along its inverse `ψ`.
   set ψ : ℕ → ℕ := fun k => if k < y then k else k + 2 with hψ_def
   have hψ : StrictMono ψ := by
     intro a b hab
@@ -285,15 +283,15 @@ theorem restricted_eq_mul_aeval {n : ℕ} (hn : 2 ≤ n) (T : Finset (intervals 
     · rintro ⟨a, ha, rfl⟩
       split_ifs <;> omega
   rw [himage, pfaffian_image_strictMono hψ]
-  -- "The `(φ(i), φ(j))` entry of the reduced matrix is then `∑_{J' ∋ φ(i), φ(j)} b_{J'}`."
+  -- The `(φ(i), φ(j))` entry of the reduced matrix is then `∑_{J' ∋ φ(i), φ(j)} b_{J'}`.
   have hentry : ∀ i ∈ Icc 1 (n - 2), ∀ j ∈ Icc 1 (n - 2), i < j →
       (restrictedMatrix n T).submatrix ψ ψ i j = (intervalMatrix (n - 2)).map (aeval b) i j := by
     intro i hi j hj hij
     rw [mem_Icc] at hi hj
     simp only [Matrix.submatrix_apply, restrictedMatrix, intervalMatrix, Matrix.map_apply,
       Matrix.of_apply, map_sum, aeval_X, b]
-    -- "For `i < j` in `[n] ∖ {y, y+1}`, `J` contains `i` and `j` iff `φ(J ∖ {y, y+1})` contains
-    -- `φ(i)` and `φ(j)`": here with `ψ = φ⁻¹`, and `φ(J ∖ {y, y+1})` given by `collapse`.
+    -- For `i < j` in `[n] ∖ {y, y+1}`, `J` contains `i` and `j` iff `φ(J ∖ {y, y+1})` contains
+    -- `φ(i)` and `φ(j)`; here with `ψ = φ⁻¹`, and `φ(J ∖ {y, y+1})` given by `collapse`.
     have key : ∀ J ∈ T, (ψ i ∈ Icc J.1.1 J.1.2 ∧ ψ j ∈ Icc J.1.1 J.1.2) ↔
         ∃ J' : intervals (n - 2),
           (i ∈ Icc J'.1.1 J'.1.2 ∧ j ∈ Icc J'.1.1 J'.1.2) ∧ collapse y J.1 = J'.1 := by
@@ -317,8 +315,8 @@ theorem restricted_eq_mul_aeval {n : ℕ} (hn : 2 ≤ n) (T : Finset (intervals 
         simp only [intervals, collapse, mem_filter, mem_product, mem_Icc] at hJ' hJ'2 ⊢
         simp only [hψ_def]
         split_ifs at hJ' hJ'2 ⊢ <;> omega
-    -- "intervals whose image has at most one point enter no entry": each `J ∈ S` enters through
-    -- the single interval `φ(J ∖ {y, y+1})`, so we exchange the two sums.
+    -- Intervals whose image has at most one point enter no entry, and each `J ∈ S` enters
+    -- through the single interval `φ(J ∖ {y, y+1})`, so we exchange the two sums.
     rw [sum_filter, sum_filter]
     have hinner : ∀ J' : intervals (n - 2),
         (if i ∈ Icc J'.1.1 J'.1.2 ∧ j ∈ Icc J'.1.1 J'.1.2 then
@@ -335,7 +333,7 @@ theorem restricted_eq_mul_aeval {n : ℕ} (hn : 2 ≤ n) (T : Finset (intervals 
     rw [Fintype.sum_ite_eq_ite_exists _ (fun J' J'' h' h'' => Subtype.ext (h'.2.symm.trans h''.2))]
     exact if_congr (key J hJT) rfl rfl
   rw [pfaffian_congr hentry]
-  -- "so `Pf(A^S_{[n] ∖ {y, y+1}}) = F_{n−2}(b)`" (evaluation lemma).
+  -- So `Pf(A^S_{[n] ∖ {y, y+1}}) = F_{n−2}(b)`, by the evaluation lemma.
   have heval := RingHom.map_pfaffian (aeval b).toRingHom (Icc 1 (n - 2)) (intervalMatrix (n - 2))
   simp only [AlgHom.toRingHom_eq_coe, RingHom.coe_coe] at heval
   rw [intervalPfaffian, heval]
@@ -344,12 +342,12 @@ theorem restricted_eq_mul_aeval {n : ℕ} (hn : 2 ≤ n) (T : Finset (intervals 
 
 /-- **Coefficient positivity**, nonnegativity: every coefficient of `F_n` is `≥ 0`. -/
 theorem coeff_nonneg (n : ℕ) (m : intervals n →₀ ℕ) : 0 ≤ (intervalPfaffian n).coeff m := by
-  -- "Nonnegativity, by induction on `n`."
+  -- Induction on `n`.
   induction n using Nat.strong_induction_on with
   | _ n ih =>
   by_cases hm : (intervalPfaffian n).coeff m = 0
   · rw [hm]
-  -- "Fix a monomial `a^μ` of degree `n/2` with support `S`. So `|S| ≤ n/2`."
+  -- Fix a monomial `a^μ` of degree `n/2` with support `S`, so `|S| ≤ n/2`.
   have hdeg : Finsupp.weight 1 m = n / 2 := intervalPfaffian_isHomogeneous n hm
   set T := m.support
   have hT : 2 * #T ≤ n := by
@@ -358,9 +356,9 @@ theorem coeff_nonneg (n : ℕ) (m : intervals n →₀ ℕ) : 0 ≤ (intervalPfa
       exact sum_le_sum fun J hJ => by
         simpa using Nat.one_le_iff_ne_zero.2 (Finsupp.mem_support_iff.1 hJ)
     omega
-  -- "The coefficient of `a^μ` in `F_n` equals its coefficient in `F^S`."
+  -- The coefficient of `a^μ` in `F_n` equals its coefficient in `F^S`.
   rw [coeff_intervalPfaffian_eq_restricted n T m subset_rfl]
-  -- (i) "If some point `y` of `[n]` lies in no `J ∈ S` … `F^S = 0`."
+  -- Case (i): some point `y` of `[n]` lies in no `J ∈ S`, so `F^S = 0`.
   by_cases hcov : ∀ i ∈ Icc 1 n, ∃ J ∈ T, i ∈ Icc J.1.1 J.1.2
   swap
   · push Not at hcov
@@ -371,18 +369,18 @@ theorem coeff_nonneg (n : ℕ) (m : intervals n →₀ ℕ) : 0 ≤ (intervalPfa
   rcases Nat.eq_zero_or_pos n with rfl | hpos
   · rw [show (Icc 1 0 : Finset ℕ) = ∅ by decide, pfaffian_empty, coeff_one]
     split_ifs <;> norm_num
-  -- (ii) "Otherwise … some gap `y` is cut by no `J ∈ S`" (`n = 1` is excluded by `|S| ≤ n/2`).
+  -- Case (ii): otherwise some gap `y` is cut by no `J ∈ S` (`n = 1` is excluded by `|S| ≤ n/2`).
   have hn : 2 ≤ n := by
     by_contra h
     obtain ⟨J, hJT, -⟩ := hcov 1 (mem_Icc.2 ⟨le_rfl, hpos⟩)
     have : 1 ≤ #T := card_pos.2 ⟨J, hJT⟩
     omega
   obtain ⟨y, hy, huncut⟩ := exists_uncut_gap n hn T hT hcov
-  -- "`F^S = s F_{n−2}(b)`" by the reduced Pfaffian.
+  -- `F^S = s F_{n−2}(b)` by the reduced Pfaffian.
   rw [restricted_eq_mul_aeval hn T hy huncut]
-  -- "By the induction hypothesis `F_{n−2}` has nonnegative integer coefficients. Each `b_{J'}` is
-  -- a sum of indeterminates `a_J` (or `0`), and `s` is a sum of indeterminates. So `F^S` is a
-  -- polynomial in the `a_J` with nonnegative integer coefficients."
+  -- By the induction hypothesis `F_{n−2}` has nonnegative integer coefficients. Each `b_{J'}` is
+  -- a sum of indeterminates `a_J` (or `0`), and `s` is a sum of indeterminates, so `F^S` is a
+  -- polynomial in the `a_J` with nonnegative integer coefficients.
   refine mul_mem (sum_X_mem_nonnegCoeffs _) (aeval_mem_nonnegCoeffs
     (fun J' => sum_X_mem_nonnegCoeffs _) fun m' => ih (n - 2) (by omega) m') m
 
@@ -393,9 +391,9 @@ theorem coeff_nonneg (n : ℕ) (m : intervals n →₀ ℕ) : 0 ≤ (intervalPfa
 theorem coeff_corner (n : ℕ) (hn : Even n) (h2 : 2 ≤ n) :
     (intervalPfaffian n).coeff (Finsupp.single ⟨(1, n), corner_mem_intervals h2⟩ (n / 2)) = 1 := by
   set J₀ : intervals n := ⟨(1, n), corner_mem_intervals h2⟩
-  -- "Setting `a_J = 0` for `J ≠ [1, n]` …"
+  -- Setting `a_J = 0` for `J ≠ [1, n]` …
   rw [coeff_intervalPfaffian_eq_restricted n {J₀} _ Finsupp.support_single_subset]
-  -- "… gives `F_n = Pf(a_[1,n] 𝒯_n)`"
+  -- … gives `F_n = Pf(a_[1,n] 𝒯_n)`,
   have hmat : pfaffian (Icc 1 n) (restrictedMatrix n {J₀}) =
       pfaffian (Icc 1 n)
         ((X J₀ : MvPolynomial (intervals n) ℤ) •
@@ -407,7 +405,7 @@ theorem coeff_corner (n : ℕ) (hn : Even n) (h2 : 2 ≤ n) :
       omega
     simp only [restrictedMatrix, Matrix.of_apply, filter_singleton, ite_eq_left hJ, sum_singleton,
       Matrix.smul_apply, skewExtension, ite_eq_left hij, smul_eq_mul, mul_one]
-  -- "This equals `a_[1,n]^{n/2} Pf(𝒯_n)`, and `Pf(𝒯_n) = 1`."
+  -- which equals `a_[1,n]^{n/2} Pf(𝒯_n)`, and `Pf(𝒯_n) = 1`.
   rw [hmat, pfaffian_smul, Nat.card_Icc, add_tsub_cancel_right, pfaffian_skewOnes n hn, mul_one,
     X_pow_eq_monomial, coeff_monomial, ite_eq_left rfl]
 
@@ -453,7 +451,7 @@ theorem intervalPfaffian_four :
     rw [hentry, show ({J ∈ intervals 4 | 3 ∈ Icc J.1 J.2 ∧ 4 ∈ Icc J.1 J.2} : Finset (ℕ × ℕ)) =
       {(1, 4), (2, 4), (3, 4)} by decide]
     simp [add_assoc]
-  -- `F_4 = Pf = A₁₂ A₃₄ - A₁₃ A₂₄ + A₁₄ A₂₃` (eq. (2), by the first-row expansion).
+  -- `F_4 = Pf = A₁₂ A₃₄ - A₁₃ A₂₄ + A₁₄ A₂₃`, by the first-row expansion.
   have hpf4 : ∀ A : Matrix ℕ ℕ (MvPolynomial (intervals 4) ℤ),
       pfaffian (Icc 1 4) A = A 1 2 * A 3 4 - A 1 3 * A 2 4 + A 1 4 * A 2 3 := by
     intro A

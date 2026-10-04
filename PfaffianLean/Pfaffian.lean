@@ -3,8 +3,6 @@ import Mathlib
 /-!
 # Pfaffians as signed sums over perfect matchings
 
-Reference: `refs/pfaffian-convex.tex`, Section 1, equation (1).
-
 We work with a finite index set `S : Finset ι` inside a linearly ordered type `ι` (in practice
 `ι = ℕ` and `S = Finset.Icc 1 n`). The Pfaffian of a matrix `A` on `S` is the Pfaffian of the
 principal submatrix of `A` on `S`, with `S` in increasing order:

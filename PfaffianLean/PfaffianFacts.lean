@@ -3,15 +3,13 @@ import PfaffianLean.TwinRows
 /-!
 # Further facts about Pfaffians
 
-Reference: `refs/pfaffian-convex.tex`, Section 1.
-
 * `PerfectMatching.two_mul_card`: a perfect matching of `S` has `#S / 2` edges.
 * `pfaffian_smul`: `Pf(c A) = c ^ (#S / 2) Pf A`.
 * `pfaffian_image_strictMono`: the Pfaffian is unchanged under a strictly monotone change of
   index (used for the map `φ` in Coefficient positivity).
 * `pfaffian_eq_zero_of_row`: a zero row (on the upper entries) makes the Pfaffian vanish.
 * `pfaffian_skewOnes`: the skew matrix `𝒯` with all upper entries `1` has Pfaffian `1`, proved
-  as in the reference by the first-row expansion.
+  by the first-row expansion.
 -/
 
 open Finset
@@ -129,7 +127,7 @@ theorem pfaffian_eq_zero_of_row {S : Finset ι} {A : Matrix ι ι R} {y : ι} (h
 /-- `Pf(𝒯) = 1` on every index set of even size. -/
 theorem pfaffian_skewExtension_ones_of_even_card {S : Finset ι} (hS : Even #S) :
     pfaffian S (skewExtension (Matrix.of fun _ _ => (1 : R))) = 1 := by
-  -- "By the first-row expansion and induction its Pfaffian is `∑_{l=2}^{2p} (-1)^l = 1`."
+  -- By the first-row expansion and induction, the Pfaffian is `∑_{l=2}^{2p} (-1)^l = 1`.
   -- The alternating sum: `∑_{l ∈ s} (-1)^(rank of l in s)` is `1` for `#s` odd and `0` for `#s`
   -- even (induction on `s`, adding a new largest element).
   have halt : ∀ s : Finset ι,
@@ -162,14 +160,14 @@ theorem pfaffian_skewExtension_ones_of_even_card {S : Finset ι} (hS : Even #S) 
     rcases S.eq_empty_or_nonempty with rfl | hne
     · exact pfaffian_empty _
     obtain ⟨r, hr⟩ := hS
-    -- "First-row expansion": expand along the minimum `m` of `S`.
+    -- First-row expansion along the minimum `m` of `S`.
     set m := S.min' hne
     have hSm : S = insert m (S.erase m) := (insert_erase (S.min'_mem hne)).symm
     have hlt : ∀ x ∈ S.erase m, m < x := fun x hx =>
       S.min'_lt_of_mem_erase_min' hne hx
     have hcard : #(S.erase m) + 1 = #S := card_erase_add_one (S.min'_mem hne)
     rw [hSm, pfaffian_insert_of_forall_lt hlt]
-    -- "and induction": each `Pf(𝒯)` on `S ∖ {m, l}` is `1`; every entry `𝒯_{m l}` is `1`.
+    -- By induction, each `Pf(𝒯)` on `S ∖ {m, l}` is `1`; every entry `𝒯_{m l}` is `1`.
     have hrest : ∀ l ∈ S.erase m, (-1 : R) ^ #{x ∈ S.erase m | x < l} *
         skewExtension (Matrix.of fun _ _ => (1 : R)) m l *
           pfaffian ((S.erase m).erase l) (skewExtension (Matrix.of fun _ _ => (1 : R))) =
@@ -178,7 +176,7 @@ theorem pfaffian_skewExtension_ones_of_even_card {S : Finset ι} (hS : Even #S) 
       have hcl : #((S.erase m).erase l) + 1 = #(S.erase m) := card_erase_add_one hl
       rw [ih #((S.erase m).erase l) (by omega) ⟨r - 1, by omega⟩ rfl, mul_one]
       simp [skewExtension, hlt l hl]
-    -- "its Pfaffian is `∑_{l=2}^{2p} (-1)^l = 1`": an alternating sum of odd length.
+    -- What remains is an alternating sum of odd length, which is `1`.
     rw [sum_congr rfl hrest, halt, ite_eq_right (Nat.not_even_iff_odd.2 ⟨r - 1, by omega⟩)]
 
 /-- **`Pf(𝒯_n) = 1`** for every even `n`, where `𝒯_n` is the skew matrix with all upper entries
