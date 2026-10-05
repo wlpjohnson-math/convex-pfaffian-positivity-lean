@@ -5,6 +5,7 @@ import PfaffianLean.ConvexKernel
 import PfaffianLean.TwinRows
 import PfaffianLean.CoeffPositivity
 import PfaffianLean.LowerBounds
+import PfaffianLean.PowerKernels
 
 /-!
 # Specification
@@ -376,6 +377,38 @@ theorem spec_convex_lower_bound_skew (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi
 /-- info: 'convex_lower_bound_skew' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms convex_lower_bound_skew
+
+/-! ## M5 lemmas (power kernels) -/
+
+theorem spec_power_kernel_lower_bound (p : ℝ) (hp : 0 < p) (n : ℕ) (hn : Even n) (x : ℕ → ℝ)
+    (hx : StrictMonoOn x (Set.Icc 1 n)) :
+    pfaffian (Icc 1 n) (kernel (fun r => r ^ (-p)) x) ≥ ((x n - x 1) ^ (-p)) ^ (n / 2) ∧
+      ((x n - x 1) ^ (-p)) ^ (n / 2) > 0 :=
+  power_kernel_lower_bound p hp n hn x hx
+
+theorem spec_albouy_moeckel_pos (n : ℕ) (hn : Even n) (x : ℕ → ℝ)
+    (hx : StrictMonoOn x (Set.Icc 1 n)) :
+    pfaffian (Icc 1 n) (kernel (fun r => r ^ (-2 : ℝ)) x) > 0 :=
+  albouy_moeckel_pos n hn x hx
+
+/-- The conclusion of `power_kernel_lower_bound` is the conclusion of `convex_lower_bound` at
+`f r = r ^ (-p)`, up to β-reduction. -/
+example (p : ℝ) (n : ℕ) (x : ℕ → ℝ) :
+    (pfaffian (Icc 1 n) (kernel (fun r => r ^ (-p)) x) ≥ ((x n - x 1) ^ (-p)) ^ (n / 2) ∧
+      ((x n - x 1) ^ (-p)) ^ (n / 2) > 0) =
+    (let f : ℝ → ℝ := fun r => r ^ (-p)
+     pfaffian (Icc 1 n) (kernel f x) ≥ f (x n - x 1) ^ (n / 2) ∧ f (x n - x 1) ^ (n / 2) > 0) :=
+  rfl
+
+/-! ## M5 axiom guards (power kernels; enabled at the M5 proof gate) -/
+
+-- /-- info: 'power_kernel_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms power_kernel_lower_bound
+
+-- /-- info: 'albouy_moeckel_pos' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms albouy_moeckel_pos
 
 /-! ## Non-vacuity
 
