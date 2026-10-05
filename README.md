@@ -2,15 +2,9 @@
 
 A Lean 4 + Mathlib formalization of a positivity theorem for Pfaffians of convex nonincreasing kernels.
 
-The formalization is complete apart from the power-kernel results below, which are in
-progress. Outside those, there is no `sorry`, and every result in
+The formalization is complete: there is no `sorry`, and every result in
 [`PfaffianLean/Spec.lean`](PfaffianLean/Spec.lean) depends only on the axioms `propext`,
 `Classical.choice` and `Quot.sound`.
-
-**In progress: power kernels.** [`PfaffianLean/PowerKernels.lean`](PfaffianLean/PowerKernels.lean)
-states the Convex lower bound for `f(r) = r^(-p)`, `p > 0` (`power_kernel_lower_bound`), and its
-case `p = 2`, the Albouy–Moeckel kernel (`albouy_moeckel_pos`). Their statements are under review
-and their proofs are still `sorry`.
 
 ## Main theorem
 
@@ -36,6 +30,32 @@ Since `pfaffian` reads only the entries with `i < j`, the statement is about `Pf
 
 The case `n = 0` is included; there both sides equal `1`.
 
+## Power kernels
+
+For `p > 0`, the function `f(r) = r^(−p)` is positive, nonincreasing and convex on `(0, ∞)`, so
+the Convex lower bound applies to it. The exponent is real (`Real.rpow`).
+
+```lean
+theorem power_kernel_lower_bound (p : ℝ) (hp : 0 < p) (n : ℕ) (hn : Even n) (x : ℕ → ℝ)
+    (hx : StrictMonoOn x (Set.Icc 1 n)) :
+    pfaffian (Icc 1 n) (kernel (fun r => r ^ (-p)) x) ≥ ((x n - x 1) ^ (-p)) ^ (n / 2) ∧
+      ((x n - x 1) ^ (-p)) ^ (n / 2) > 0
+
+theorem albouy_moeckel_pos (n : ℕ) (hn : Even n) (x : ℕ → ℝ)
+    (hx : StrictMonoOn x (Set.Icc 1 n)) :
+    pfaffian (Icc 1 n) (kernel (fun r => r ^ (-2 : ℝ)) x) > 0
+```
+
+The case `p = 2` is the Albouy–Moeckel kernel. That their matrix is this kernel is shown in the
+paper, not here.
+
+For `i ≥ j`, `kernel` evaluates `Real.rpow` at `r ≤ 0`, where its value is a convention. This has
+no effect, since `pfaffian` reads only the entries with `i < j`, where `r > 0`.
+
+Mathlib proves convexity of `r ↦ r^p` only for `p ≥ 1`, concavity only for `0 ≤ p ≤ 1`, and
+convexity for integer exponents. Convexity for negative real exponents (`convexOn_rpow_neg`) is
+proved here by composing with `r ↦ r⁻¹`.
+
 ## Results
 
 | Result | Lean | File |
@@ -53,6 +73,8 @@ The case `n = 0` is included; there both sides equal `1`.
 | Additive lower bound | `additive_lower_bound` | `LowerBounds.lean` |
 | Convex lower bound | `convex_lower_bound` | `LowerBounds.lean` |
 | Convex lower bound, skew-symmetric form | `convex_lower_bound_skew` | `LowerBounds.lean` |
+| Power kernels `r^(−p)`, `p > 0` | `power_kernel_lower_bound`, `convexOn_rpow_neg` | `PowerKernels.lean` |
+| Albouy–Moeckel kernel (`p = 2`) | `albouy_moeckel_pos` | `PowerKernels.lean` |
 
 The main proofs are written as named `have` steps, each commented with the step of the argument
 it proves.
@@ -130,7 +152,7 @@ The result relies on three things:
 - Lean's kernel.
 - Mathlib's definitions of the standard notions in the statements: ℝ, `ConvexOn`, `AntitoneOn`,
   `StrictMonoOn`, `Even`, `Finset`, `Set.Icc`, `Matrix` and `MvPolynomial`. `MvPolynomial` is
-  used only in the intermediate statements.
+  used only in the intermediate statements. The power-kernel results also use `Real.rpow`.
 - The project definitions pinned in `Spec.lean`. The main theorem uses only five of them:
   `edges`, `perfectMatchings`, `crossings`, `pfaffian` and `kernel`, plus `skewExtension` for the
   skew form. `intervals`, `pad`, `alpha`, `additiveClass`, `intervalMatrix` and
@@ -165,6 +187,7 @@ The `F_4` expansion is checked in `CoeffPositivity.lean`.
 | `PfaffianLean/PfaffianFacts.lean` | `Pf(cA)`, reindexing, zero rows, `Pf(𝒯_n) = 1` |
 | `PfaffianLean/CoeffPositivity.lean` | Coefficient positivity and the `F_4` check |
 | `PfaffianLean/LowerBounds.lean` | Additive and Convex lower bounds |
+| `PfaffianLean/PowerKernels.lean` | Power kernels `r^(−p)` and the Albouy–Moeckel case |
 | `PfaffianLean/Spec.lean` | Frozen statements, definition guards, axiom guards and non-vacuity examples |
 
 ## Verification
