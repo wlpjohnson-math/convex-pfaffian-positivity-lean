@@ -2,9 +2,15 @@
 
 A Lean 4 + Mathlib formalization of a positivity theorem for Pfaffians of convex nonincreasing kernels.
 
-The formalization is complete: there is no `sorry`, and every result in
+The formalization is complete apart from the power-kernel results below, which are in
+progress. Outside those, there is no `sorry`, and every result in
 [`PfaffianLean/Spec.lean`](PfaffianLean/Spec.lean) depends only on the axioms `propext`,
 `Classical.choice` and `Quot.sound`.
+
+**In progress: power kernels.** [`PfaffianLean/PowerKernels.lean`](PfaffianLean/PowerKernels.lean)
+states the Convex lower bound for `f(r) = r^(-p)`, `p > 0` (`power_kernel_lower_bound`), and its
+case `p = 2`, the Albouy–Moeckel kernel (`albouy_moeckel_pos`). Their statements are under review
+and their proofs are still `sorry`.
 
 ## Main theorem
 

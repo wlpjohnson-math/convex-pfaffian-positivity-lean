@@ -7,4 +7,5 @@ import PfaffianLean.TwinRows
 import PfaffianLean.PfaffianFacts
 import PfaffianLean.CoeffPositivity
 import PfaffianLean.LowerBounds
+import PfaffianLean.PowerKernels
 import PfaffianLean.Spec
