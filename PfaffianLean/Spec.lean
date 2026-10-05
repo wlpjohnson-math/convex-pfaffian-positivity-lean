@@ -402,13 +402,13 @@ example (p : ℝ) (n : ℕ) (x : ℕ → ℝ) :
 
 /-! ## M5 axiom guards (power kernels; enabled at the M5 proof gate) -/
 
--- /-- info: 'power_kernel_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms power_kernel_lower_bound
+/-- info: 'power_kernel_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms power_kernel_lower_bound
 
--- /-- info: 'albouy_moeckel_pos' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms albouy_moeckel_pos
+/-- info: 'albouy_moeckel_pos' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms albouy_moeckel_pos
 
 /-! ## Non-vacuity
 
