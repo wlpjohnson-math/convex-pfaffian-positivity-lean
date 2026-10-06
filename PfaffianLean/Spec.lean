@@ -479,13 +479,13 @@ example : ({(1, 2), (3, 4)} : Finset (ℕ × ℕ)) ∈ perfectMatchings (Icc 1 4
 
 /-! ## M7 axiom guards (enabled at the M7 proof gate) -/
 
--- /-- info: 'rainbow_mem_perfectMatchings' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms rainbow_mem_perfectMatchings
+/-- info: 'rainbow_mem_perfectMatchings' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms rainbow_mem_perfectMatchings
 
--- /-- info: 'exists_pfaffian_lt_prod_of_ne_rainbow' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms exists_pfaffian_lt_prod_of_ne_rainbow
+/-- info: 'exists_pfaffian_lt_prod_of_ne_rainbow' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms exists_pfaffian_lt_prod_of_ne_rainbow
 
 /-! ## Non-vacuity
 
