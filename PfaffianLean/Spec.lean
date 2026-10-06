@@ -433,17 +433,17 @@ theorem spec_convex_rainbow_bound (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0
 
 /-! ## M6 axiom guards (enabled at the M6 proof gate) -/
 
--- /-- info: 'outer_pair_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms outer_pair_bound
+/-- info: 'outer_pair_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms outer_pair_bound
 
--- /-- info: 'additive_rainbow_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms additive_rainbow_bound
+/-- info: 'additive_rainbow_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms additive_rainbow_bound
 
--- /-- info: 'convex_rainbow_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
--- #guard_msgs in
--- #print axioms convex_rainbow_bound
+/-- info: 'convex_rainbow_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms convex_rainbow_bound
 
 /-! ## Non-vacuity
 
