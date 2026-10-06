@@ -6,6 +6,7 @@ import PfaffianLean.TwinRows
 import PfaffianLean.CoeffPositivity
 import PfaffianLean.LowerBounds
 import PfaffianLean.PowerKernels
+import PfaffianLean.Rainbow
 
 /-!
 # Specification
@@ -409,6 +410,40 @@ example (p : ℝ) (n : ℕ) (x : ℕ → ℝ) :
 /-- info: 'albouy_moeckel_pos' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms albouy_moeckel_pos
+
+/-! ## M6 lemmas (the rainbow bound) -/
+
+theorem spec_outer_pair_bound (n : ℕ) (hn : Even n) (h2 : 2 ≤ n) (K : Matrix ℕ ℕ ℝ)
+    (hK : K ∈ additiveClass n) :
+    pfaffian (Icc 1 n) K ≥ K 1 n * pfaffian (Icc 2 (n - 1)) K :=
+  outer_pair_bound n hn h2 K hK
+
+theorem spec_additive_rainbow_bound (n : ℕ) (hn : Even n) (K : Matrix ℕ ℕ ℝ)
+    (hK : K ∈ additiveClass n) :
+    pfaffian (Icc 1 n) K ≥ ∏ k ∈ Icc 1 (n / 2), K k (n + 1 - k) ∧
+      ∏ k ∈ Icc 1 (n / 2), K k (n + 1 - k) ≥ K 1 n ^ (n / 2) :=
+  additive_rainbow_bound n hn K hK
+
+theorem spec_convex_rainbow_bound (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0 : ℝ), 0 < f t)
+    (hanti : AntitoneOn f (Set.Ioi 0)) (hconv : ConvexOn ℝ (Set.Ioi 0) f) (n : ℕ) (hn : Even n)
+    (x : ℕ → ℝ) (hx : StrictMonoOn x (Set.Icc 1 n)) :
+    pfaffian (Icc 1 n) (kernel f x) ≥ ∏ k ∈ Icc 1 (n / 2), f (x (n + 1 - k) - x k) ∧
+      ∏ k ∈ Icc 1 (n / 2), f (x (n + 1 - k) - x k) > 0 :=
+  convex_rainbow_bound f hpos hanti hconv n hn x hx
+
+/-! ## M6 axiom guards (enabled at the M6 proof gate) -/
+
+-- /-- info: 'outer_pair_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms outer_pair_bound
+
+-- /-- info: 'additive_rainbow_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms additive_rainbow_bound
+
+-- /-- info: 'convex_rainbow_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms convex_rainbow_bound
 
 /-! ## Non-vacuity
 
