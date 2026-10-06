@@ -2,16 +2,9 @@
 
 A Lean 4 + Mathlib formalization of a positivity theorem for Pfaffians of convex nonincreasing kernels.
 
-The formalization is complete apart from the rainbow-bound results below, which are in
-progress. Outside those, there is no `sorry`, and every result in
+The formalization is complete: there is no `sorry`, and every result in
 [`PfaffianLean/Spec.lean`](PfaffianLean/Spec.lean) depends only on the axioms `propext`,
 `Classical.choice` and `Quot.sound`.
-
-**In progress: the rainbow bound.** [`PfaffianLean/Rainbow.lean`](PfaffianLean/Rainbow.lean)
-states the outer-pair bound (`outer_pair_bound`) and the rainbow bound
-`Pf(K) ≥ ∏_{k=1}^{n/2} K(k, n+1-k)` on the additive class (`additive_rainbow_bound`) and for
-convex kernels (`convex_rainbow_bound`). Their statements are under review and their proofs are
-still `sorry`.
 
 ## Main theorem
 
@@ -63,6 +56,41 @@ Mathlib proves convexity of `r ↦ r^p` only for `p ≥ 1`, concavity only for `
 convexity for integer exponents. Convexity for negative real exponents (`convexOn_rpow_neg`) is
 proved here by composing with `r ↦ r⁻¹`.
 
+## The rainbow bound
+
+For even `n` and `K` in the additive class `𝒜_n`, removing the outer pair `{1, n}` gives the
+outer-pair bound. Iterating it gives the rainbow bound, a product over the rainbow matching
+`{k, n+1−k}`:
+
+```lean
+theorem outer_pair_bound (n : ℕ) (hn : Even n) (h2 : 2 ≤ n) (K : Matrix ℕ ℕ ℝ)
+    (hK : K ∈ additiveClass n) :
+    pfaffian (Icc 1 n) K ≥ K 1 n * pfaffian (Icc 2 (n - 1)) K
+
+theorem additive_rainbow_bound (n : ℕ) (hn : Even n) (K : Matrix ℕ ℕ ℝ)
+    (hK : K ∈ additiveClass n) :
+    pfaffian (Icc 1 n) K ≥ ∏ k ∈ Icc 1 (n / 2), K k (n + 1 - k) ∧
+      ∏ k ∈ Icc 1 (n / 2), K k (n + 1 - k) ≥ K 1 n ^ (n / 2)
+
+theorem convex_rainbow_bound (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0 : ℝ), 0 < f t)
+    (hanti : AntitoneOn f (Set.Ioi 0)) (hconv : ConvexOn ℝ (Set.Ioi 0) f) (n : ℕ) (hn : Even n)
+    (x : ℕ → ℝ) (hx : StrictMonoOn x (Set.Icc 1 n)) :
+    pfaffian (Icc 1 n) (kernel f x) ≥ ∏ k ∈ Icc 1 (n / 2), f (x (n + 1 - k) - x k) ∧
+      ∏ k ∈ Icc 1 (n / 2), f (x (n + 1 - k) - x k) > 0
+```
+
+`convex_rainbow_bound` has exactly the hypotheses of `convex_lower_bound`, and its bound is the
+stronger one: applied to `K = kernel f x`, the second part of `additive_rainbow_bound` shows that
+the product is at least `f(x_n − x_1)^{n/2}`.
+
+The outer-pair bound is proved through the first-row expansion. Abel summation writes
+`Pf(K) − K(1, n) Pf(K_{[2,n−1]})` as a sum of prefix sums of the bordered-Pfaffian cofactors of
+`K_{[2,n]}`, with coefficients `α_[1,q](K) ≥ 0` and `K(1, n−1) ≥ 0`. Each prefix sum is `≥ 0`
+(`prefixSum_nonneg`): for `h > 0`, `h` times a perturbed prefix sum is the Pfaffian of a family in
+the additive class (`oneBorder`), so it is `≥ 0` by the Additive lower bound, and the prefix sum
+itself follows by letting `h → 0⁺`. The iteration uses that `𝒜_n` is closed under deleting the
+first or the last point.
+
 ## Results
 
 | Result | Lean | File |
@@ -82,6 +110,11 @@ proved here by composing with `r ↦ r⁻¹`.
 | Convex lower bound, skew-symmetric form | `convex_lower_bound_skew` | `LowerBounds.lean` |
 | Power kernels `r^(−p)`, `p > 0` | `power_kernel_lower_bound`, `convexOn_rpow_neg` | `PowerKernels.lean` |
 | Albouy–Moeckel kernel (`p = 2`) | `albouy_moeckel_pos` | `PowerKernels.lean` |
+| Restriction: deleting the first or the last point | `mem_additiveClass_of_succ`, `submatrix_succ_mem_additiveClass` | `Rainbow.lean` |
+| Prefix sums of the bordered-Pfaffian cofactors are `≥ 0` | `prefixSum_nonneg`, `pfaffian_oneBorder`, `oneBorder_mem_additiveClass` | `Rainbow.lean` |
+| Abel summation for the first-row expansion | `firstRowPartial_eq_abel`, `firstRowPartial_eq_sub` | `Rainbow.lean` |
+| Outer-pair bound | `outer_pair_bound` | `Rainbow.lean` |
+| Rainbow bound | `additive_rainbow_bound`, `convex_rainbow_bound` | `Rainbow.lean` |
 
 The main proofs are written as named `have` steps, each commented with the step of the argument
 it proves.
@@ -162,8 +195,10 @@ The result relies on three things:
   used only in the intermediate statements. The power-kernel results also use `Real.rpow`.
 - The project definitions pinned in `Spec.lean`. The main theorem uses only five of them:
   `edges`, `perfectMatchings`, `crossings`, `pfaffian` and `kernel`, plus `skewExtension` for the
-  skew form. `intervals`, `pad`, `alpha`, `additiveClass`, `intervalMatrix` and
-  `intervalPfaffian` appear only in intermediate statements.
+  skew form; so do the power-kernel results and `convex_rainbow_bound`. `intervals`, `pad`,
+  `alpha` and `additiveClass` also appear in the statements about the additive class
+  (`additive_lower_bound`, `outer_pair_bound` and `additive_rainbow_bound`), and
+  `intervalMatrix` and `intervalPfaffian` only in intermediate statements.
 
 ## Building
 
@@ -195,6 +230,7 @@ The `F_4` expansion is checked in `CoeffPositivity.lean`.
 | `PfaffianLean/CoeffPositivity.lean` | Coefficient positivity and the `F_4` check |
 | `PfaffianLean/LowerBounds.lean` | Additive and Convex lower bounds |
 | `PfaffianLean/PowerKernels.lean` | Power kernels `r^(−p)` and the Albouy–Moeckel case |
+| `PfaffianLean/Rainbow.lean` | Outer-pair bound and the rainbow bound |
 | `PfaffianLean/Spec.lean` | Frozen statements, definition guards, axiom guards and non-vacuity examples |
 
 ## Verification
