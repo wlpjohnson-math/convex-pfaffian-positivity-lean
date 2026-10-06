@@ -2,16 +2,9 @@
 
 A Lean 4 + Mathlib formalization of a positivity theorem for Pfaffians of convex nonincreasing kernels.
 
-The formalization is complete apart from the sharpness results below, which are in progress.
-Outside those, there is no `sorry`, and every result in
+The formalization is complete: there is no `sorry`, and every result in
 [`PfaffianLean/Spec.lean`](PfaffianLean/Spec.lean) depends only on the axioms `propext`,
 `Classical.choice` and `Quot.sound`.
-
-**In progress: only the rainbow survives.**
-[`PfaffianLean/Sharpness.lean`](PfaffianLean/Sharpness.lean) defines the rainbow matching
-(`rainbow`) and states that for every other perfect matching `M` of `[n]` some convex kernel has
-`Pf A_f(x) < ∏_M f` (`exists_pfaffian_lt_prod_of_ne_rainbow`). Its statements are under review
-and its proofs are still `sorry`.
 
 ## Main theorem
 
@@ -98,6 +91,32 @@ the additive class (`oneBorder`), so it is `≥ 0` by the Additive lower bound, 
 itself follows by letting `h → 0⁺`. The iteration uses that `𝒜_n` is closed under deleting the
 first or the last point.
 
+## Only the rainbow survives
+
+The rainbow is the only perfect matching whose product is a lower bound for every convex kernel.
+`rainbow n` is the matching `{(k, n+1−k) : 1 ≤ k ≤ n/2}`, a perfect matching of `[n]` for even
+`n` (`rainbow_mem_perfectMatchings`). For every other perfect matching, the bound fails for some
+kernel:
+
+```lean
+theorem exists_pfaffian_lt_prod_of_ne_rainbow (n : ℕ) (hn : Even n) (M : Finset (ℕ × ℕ))
+    (hM : M ∈ perfectMatchings (Icc 1 n)) (hMr : M ≠ rainbow n) :
+    ∃ f : ℝ → ℝ, (∀ t ∈ Set.Ioi (0 : ℝ), 0 < f t) ∧ AntitoneOn f (Set.Ioi 0) ∧
+      ConvexOn ℝ (Set.Ioi 0) f ∧
+      ∃ x : ℕ → ℝ, StrictMonoOn x (Set.Icc 1 n) ∧
+        pfaffian (Icc 1 n) (kernel f x) < ∏ e ∈ M, f (x e.2 - x e.1)
+```
+
+For `n = 0` and `n = 2` the rainbow is the only perfect matching, so the statement has content
+for `n ≥ 4`.
+
+The construction uses `f(r) = max(9 − r, 1)`. If `M` first departs from the rainbow at the pair
+`(k+1, n−k)`, the points `k+2, …, n−k−1` are placed at `ε·i`, and the other points at least `8`
+apart from each other, where `f = 1`. At `ε = 0` the inner points coincide: Twin rows removes them in pairs, each
+contributing `f(0) = 9`, so `Pf = 9^{n/2−k−1}`, while the product over `M` is at least
+`(25/9)·9^{n/2−k−1}`. Both sides are continuous in `ε`, so the strict inequality holds for some
+small `ε > 0`, where the points are strictly increasing.
+
 ## Results
 
 | Result | Lean | File |
@@ -122,6 +141,10 @@ first or the last point.
 | Abel summation for the first-row expansion | `firstRowPartial_eq_abel`, `firstRowPartial_eq_sub` | `Rainbow.lean` |
 | Outer-pair bound | `outer_pair_bound` | `Rainbow.lean` |
 | Rainbow bound | `additive_rainbow_bound`, `convex_rainbow_bound` | `Rainbow.lean` |
+| The rainbow matching | `rainbow`, `rainbow_mem_perfectMatchings` | `Sharpness.lean` |
+| Only the rainbow survives | `exists_pfaffian_lt_prod_of_ne_rainbow` | `Sharpness.lean` |
+| First departure from the rainbow | `exists_first_departure` | `Sharpness.lean` |
+| The construction at `ε = 0` | `pfaffian_sharp_zero`, `prod_sharp_zero` | `Sharpness.lean` |
 
 The main proofs are written as named `have` steps, each commented with the step of the argument
 it proves.
@@ -205,7 +228,8 @@ The result relies on three things:
   skew form; so do the power-kernel results and `convex_rainbow_bound`. `intervals`, `pad`,
   `alpha` and `additiveClass` also appear in the statements about the additive class
   (`additive_lower_bound`, `outer_pair_bound` and `additive_rainbow_bound`), and
-  `intervalMatrix` and `intervalPfaffian` only in intermediate statements.
+  `intervalMatrix` and `intervalPfaffian` only in intermediate statements. The sharpness result
+  `exists_pfaffian_lt_prod_of_ne_rainbow` also uses `rainbow`.
 
 ## Building
 
@@ -238,6 +262,7 @@ The `F_4` expansion is checked in `CoeffPositivity.lean`.
 | `PfaffianLean/LowerBounds.lean` | Additive and Convex lower bounds |
 | `PfaffianLean/PowerKernels.lean` | Power kernels `r^(−p)` and the Albouy–Moeckel case |
 | `PfaffianLean/Rainbow.lean` | Outer-pair bound and the rainbow bound |
+| `PfaffianLean/Sharpness.lean` | The rainbow matching; only the rainbow survives |
 | `PfaffianLean/Spec.lean` | Frozen statements, definition guards, axiom guards and non-vacuity examples |
 
 ## Verification
