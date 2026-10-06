@@ -1,4 +1,6 @@
-# pfaffian-lean
+# convex-pfaffian-positivity-lean
+
+[![Lean Action CI](https://github.com/wlpjohnson-math/convex-pfaffian-positivity-lean/actions/workflows/lean_action_ci.yml/badge.svg)](https://github.com/wlpjohnson-math/convex-pfaffian-positivity-lean/actions/workflows/lean_action_ci.yml)
 
 A Lean 4 + Mathlib formalization of a positivity theorem for Pfaffians of convex nonincreasing kernels.
 
@@ -186,6 +188,11 @@ before any proof was written. Approved statements were then frozen in `Spec.lean
 themselves are checked by Lean. The author's review covers the definitions and statements in
 `Spec.lean`, which is what a reader needs to check to trust the result.
 
+Two arguments were devised during formalization rather than taken from the draft: the proof that
+the prefix sums of the bordered-Pfaffian cofactors are nonnegative (`prefixSum_nonneg` in
+`Rainbow.lean`, via a one-border family and the limit `h → 0⁺`), a result the draft states without
+proof; and the construction in `Sharpness.lean`, which differs from the draft's proof.
+
 ## Auditing
 
 [`PfaffianLean/Spec.lean`](PfaffianLean/Spec.lean) is the audit surface: it lets a reader check
@@ -273,3 +280,7 @@ Commits and release tags are signed with the SSH key `SHA256:rbBuGOZMBxVRlDiLsdj
 git config gpg.ssh.allowedSignersFile allowed_signers
 git log --show-signature
 ```
+
+## License
+
+Released under the Apache 2.0 license; see [`LICENSE`](LICENSE).
