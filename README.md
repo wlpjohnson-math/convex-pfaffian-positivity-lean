@@ -2,9 +2,16 @@
 
 A Lean 4 + Mathlib formalization of a positivity theorem for Pfaffians of convex nonincreasing kernels.
 
-The formalization is complete: there is no `sorry`, and every result in
+The formalization is complete apart from the rainbow-bound results below, which are in
+progress. Outside those, there is no `sorry`, and every result in
 [`PfaffianLean/Spec.lean`](PfaffianLean/Spec.lean) depends only on the axioms `propext`,
 `Classical.choice` and `Quot.sound`.
+
+**In progress: the rainbow bound.** [`PfaffianLean/Rainbow.lean`](PfaffianLean/Rainbow.lean)
+states the outer-pair bound (`outer_pair_bound`) and the rainbow bound
+`Pf(K) ≥ ∏_{k=1}^{n/2} K(k, n+1-k)` on the additive class (`additive_rainbow_bound`) and for
+convex kernels (`convex_rainbow_bound`). Their statements are under review and their proofs are
+still `sorry`.
 
 ## Main theorem
 
