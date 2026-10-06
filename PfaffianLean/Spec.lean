@@ -7,6 +7,7 @@ import PfaffianLean.CoeffPositivity
 import PfaffianLean.LowerBounds
 import PfaffianLean.PowerKernels
 import PfaffianLean.Rainbow
+import PfaffianLean.Sharpness
 
 /-!
 # Specification
@@ -444,6 +445,47 @@ theorem spec_convex_rainbow_bound (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0
 /-- info: 'convex_rainbow_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms convex_rainbow_bound
+
+/-! ## Definitions (M7) -/
+
+/--
+info: def rainbow : ℕ → Finset (ℕ × ℕ) :=
+fun n ↦ image (fun k ↦ (k, n + 1 - k)) (Icc 1 (n / 2))
+-/
+#guard_msgs in
+#print rainbow
+
+/-- Sanity check: the rainbow matching of `[4]`. -/
+example : rainbow 4 = {(1, 4), (2, 3)} := by decide
+
+/-! ## M7 lemmas (only the rainbow survives) -/
+
+theorem spec_rainbow_mem_perfectMatchings (n : ℕ) (hn : Even n) :
+    rainbow n ∈ perfectMatchings (Icc 1 n) :=
+  rainbow_mem_perfectMatchings n hn
+
+theorem spec_exists_pfaffian_lt_prod_of_ne_rainbow (n : ℕ) (hn : Even n) (M : Finset (ℕ × ℕ))
+    (hM : M ∈ perfectMatchings (Icc 1 n)) (hMr : M ≠ rainbow n) :
+    ∃ f : ℝ → ℝ, (∀ t ∈ Set.Ioi (0 : ℝ), 0 < f t) ∧ AntitoneOn f (Set.Ioi 0) ∧
+      ConvexOn ℝ (Set.Ioi 0) f ∧
+      ∃ x : ℕ → ℝ, StrictMonoOn x (Set.Icc 1 n) ∧
+        pfaffian (Icc 1 n) (kernel f x) < ∏ e ∈ M, f (x e.2 - x e.1) :=
+  exists_pfaffian_lt_prod_of_ne_rainbow n hn M hM hMr
+
+/-- Satisfiability check: the hypotheses of `exists_pfaffian_lt_prod_of_ne_rainbow` hold for
+`n = 4` and `M = {(1, 2), (3, 4)}`. -/
+example : ({(1, 2), (3, 4)} : Finset (ℕ × ℕ)) ∈ perfectMatchings (Icc 1 4) ∧
+    ({(1, 2), (3, 4)} : Finset (ℕ × ℕ)) ≠ rainbow 4 := by decide
+
+/-! ## M7 axiom guards (enabled at the M7 proof gate) -/
+
+-- /-- info: 'rainbow_mem_perfectMatchings' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms rainbow_mem_perfectMatchings
+
+-- /-- info: 'exists_pfaffian_lt_prod_of_ne_rainbow' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+-- #guard_msgs in
+-- #print axioms exists_pfaffian_lt_prod_of_ne_rainbow
 
 /-! ## Non-vacuity
 
