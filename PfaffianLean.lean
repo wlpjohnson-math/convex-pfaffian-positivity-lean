@@ -9,4 +9,5 @@ import PfaffianLean.CoeffPositivity
 import PfaffianLean.LowerBounds
 import PfaffianLean.PowerKernels
 import PfaffianLean.Rainbow
+import PfaffianLean.Sharpness
 import PfaffianLean.Spec

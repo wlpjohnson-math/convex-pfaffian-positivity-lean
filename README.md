@@ -2,9 +2,16 @@
 
 A Lean 4 + Mathlib formalization of a positivity theorem for Pfaffians of convex nonincreasing kernels.
 
-The formalization is complete: there is no `sorry`, and every result in
+The formalization is complete apart from the sharpness results below, which are in progress.
+Outside those, there is no `sorry`, and every result in
 [`PfaffianLean/Spec.lean`](PfaffianLean/Spec.lean) depends only on the axioms `propext`,
 `Classical.choice` and `Quot.sound`.
+
+**In progress: only the rainbow survives.**
+[`PfaffianLean/Sharpness.lean`](PfaffianLean/Sharpness.lean) defines the rainbow matching
+(`rainbow`) and states that for every other perfect matching `M` of `[n]` some convex kernel has
+`Pf A_f(x) < ∏_M f` (`exists_pfaffian_lt_prod_of_ne_rainbow`). Its statements are under review
+and its proofs are still `sorry`.
 
 ## Main theorem
 
