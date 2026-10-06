@@ -173,12 +173,10 @@ theorem pfaffian_oneBorder (N : ℕ) (L : Matrix ℕ ℕ ℝ) {q : ℕ} (hq : q 
   simp only [oneBorder, Matrix.of_apply, ite_true, zero_add, Nat.add_one_le_iff]
   split_ifs <;> ring
 
--- The bounds on `q` in the statement are not used: the family is additive for every `q`.
-set_option linter.unusedVariables false in
-/-- **One-border additivity.** For `L ∈ 𝒜_N`, `2 ≤ q ≤ N + 1` and `h ≥ 0`, the one-border family
-is in `𝒜_{N+1}`. -/
+/-- **One-border additivity.** For `L ∈ 𝒜_N`, every `q` and `h ≥ 0`, the one-border family is in
+`𝒜_{N+1}`. -/
 theorem oneBorder_mem_additiveClass {N : ℕ} {L : Matrix ℕ ℕ ℝ} (hL : L ∈ additiveClass N)
-    {q : ℕ} (hq2 : 2 ≤ q) (hq : q ≤ N + 1) {h : ℝ} (hh : 0 ≤ h) :
+    (q : ℕ) {h : ℝ} (hh : 0 ≤ h) :
     oneBorder L q h ∈ additiveClass (N + 1) := by
   -- Away from row `0`, the padded one-border family is the padded `L`, shifted by one, plus the
   -- step `h [j ≤ q]` (cut off at the padding column `N + 2`).
@@ -218,9 +216,6 @@ theorem oneBorder_mem_additiveClass {N : ℕ} {L : Matrix ℕ ℕ ℝ} (hL : L �
 /-- **Prefix sums are nonnegative.** For odd `N`, `L ∈ 𝒜_N` and `q ≤ N + 1`: `Z_q(L) ≥ 0`. -/
 theorem prefixSum_nonneg {N : ℕ} (hN : Odd N) {L : Matrix ℕ ℕ ℝ} (hL : L ∈ additiveClass N)
     {q : ℕ} (hq : q ≤ N + 1) : 0 ≤ prefixSum N L q := by
-  -- For `q ≤ 1` the sum is empty.
-  rcases lt_or_ge q 2 with hq2 | hq2
-  · simp [prefixSum, Ico_eq_empty_of_le (by omega : q ≤ 1)]
   -- Write `g(h) = Z_q(L + h [j < q])`.
   set M : ℝ → Matrix ℕ ℕ ℝ := fun h => Matrix.of fun i j => L i j + if j < q then h else 0
   set g : ℝ → ℝ := fun h => prefixSum N (M h) q
@@ -228,7 +223,7 @@ theorem prefixSum_nonneg {N : ℕ} (hN : Odd N) {L : Matrix ℕ ℕ ℝ} (hL : L
   -- on the even set `[N + 1]` (Additive lower bound).
   have hpos : ∀ h > 0, 0 ≤ g h := by
     intro h hh
-    have hB := oneBorder_mem_additiveClass hL hq2 hq hh.le
+    have hB := oneBorder_mem_additiveClass hL q hh.le
     obtain ⟨hpf, hge, hnn⟩ :=
       additive_lower_bound (N + 1) hN.add_one (by obtain ⟨k, rfl⟩ := hN; omega) _ hB
     have hPf : 0 ≤ pfaffian (Icc 1 (N + 1)) (oneBorder L q h) := by
