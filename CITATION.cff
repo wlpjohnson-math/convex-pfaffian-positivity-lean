@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this formalization, please cite the repository and the accompanying paper."
+
+type: software
+title: "Lean Formalization of Pfaffian Positivity for Convex Kernels and Optimal Matching Bounds"
+
+authors:
+  - family-names: Johnson
+    given-names: William
+    orcid: "https://orcid.org/0000-0002-6296-8952"
+
+repository-code: "https://github.com/wlpjohnson-math/convex-pfaffian-positivity-lean"
+version: 1.0.0
+date-released: "2026-10-16"
+
+license: Apache-2.0
+
+keywords:
+  - Lean 4
+  - Mathlib
+  - Pfaffian
+  - convex kernels
+  - formal verification

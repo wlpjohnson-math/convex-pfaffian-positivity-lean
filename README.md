@@ -2,21 +2,41 @@
 
 [![Lean Action CI](https://github.com/wlpjohnson-math/convex-pfaffian-positivity-lean/actions/workflows/lean_action_ci.yml/badge.svg)](https://github.com/wlpjohnson-math/convex-pfaffian-positivity-lean/actions/workflows/lean_action_ci.yml)
 
-A Lean 4 + Mathlib formalization of a positivity theorem for Pfaffians of convex nonincreasing kernels.
+A Lean 4 + Mathlib formalization of part of the paper *Pfaffian Positivity for Convex Kernels and
+Optimal Matching Bounds* (W. Johnson).
 
-The formalization is complete: there is no `sorry`, and every result in
-[`PfaffianLean/Spec.lean`](PfaffianLean/Spec.lean) depends only on the axioms `propext`,
-`Classical.choice` and `Quot.sound`.
+The paper studies the skew-symmetric matrix `A_f(x)` with entries `A_ij = f(x_j − x_i)` for
+`i < j`, where `x_1 < ⋯ < x_n` are points on the line and `f` is positive, nonincreasing and
+convex on `(0, ∞)`. It proves that for even `n` the Pfaffian of `A_f(x)` is positive, with the
+quantitative *diameter bound* `Pf A_f(x) ≥ f(x_n − x_1)^{n/2}` and the stronger *rainbow bound*,
+and applies these to the nonvanishing conjecture of Albouy and Moeckel for collinear central
+configurations.
+
+This repository machine-checks the core positivity theorems and the algebraic results they rest
+on, and records exactly which results of the paper are checked and in what form.
+
+## At a glance
+
+- **Formalized:** the Pfaffian Diameter Bound and the Rainbow Bound, together with Interval
+  Decomposition, Twin Rows, Coefficient Positivity, and Nonnegativity of Interval Coefficients
+  (except one conjunct; see the table).
+- **Partially formalized:** the Alternating Prefix Sums lemma and the Endpoint Inequality (real
+  inequalities only, not their coefficientwise forms), the Optimality theorem (Lean proves a
+  weaker statement), and the Albouy–Moeckel corollary (only the ordinary even-order Pfaffian).
+- **Not formalized:** the singly and doubly bordered Pfaffian corollaries and the Albouy–Moeckel
+  normalizations. **The Albouy–Moeckel conjecture itself is not formalized.**
+
+There is no `sorry`, and every result in [`PfaffianLean/Spec.lean`](PfaffianLean/Spec.lean)
+depends only on the axioms `propext`, `Classical.choice` and `Quot.sound`.
 
 ## Main theorem
 
-**Convex lower bound.** For every positive, nonincreasing, convex `f` on `(0, ∞)`, every even `n`,
-and every `x_1 < ⋯ < x_n`,
+**Pfaffian Diameter Bound** (manuscript Theorem 3.5). For every positive, nonincreasing, convex
+`f` on `(0, ∞)`, every even `n`, and every `x_1 < ⋯ < x_n`,
 
-    Pf A_f(x) ≥ f(x_n − x_1)^{n/2} > 0,
+    Pf A_f(x) ≥ f(x_n − x_1)^{n/2} > 0.
 
-where `A_f(x)` is the skew-symmetric matrix with `A_ij = f(x_j − x_i)` for `i < j`. The function
-`f` may blow up at `0`.
+The function `f` may blow up at `0`.
 
 ```lean
 theorem convex_lower_bound (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0 : ℝ), 0 < f t)
@@ -25,261 +45,120 @@ theorem convex_lower_bound (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0 : ℝ)
     pfaffian (Icc 1 n) (kernel f x) ≥ f (x n - x 1) ^ (n / 2) ∧ f (x n - x 1) ^ (n / 2) > 0
 ```
 
-`kernel f x` is the family `f(x_j − x_i)` over all `i, j`, and is not itself skew-symmetric.
-Since `pfaffian` reads only the entries with `i < j`, the statement is about `Pf A_f(x)`.
+`kernel f x` is the family `f(x_j − x_i)` over all `i, j` and is not itself skew-symmetric.
+Since `pfaffian` reads only the entries with `i < j`, the statement is about `Pf A_f(x)`;
 `convex_lower_bound_skew` states the same bound for the skew-symmetric matrix
-`skewExtension (kernel f x)`.
+`skewExtension (kernel f x)`, which is `A_f(x)`. The paper states the theorem for `n ≥ 2`; the Lean
+statement also covers `n = 0`, where both sides equal `1`.
 
-The case `n = 0` is included; there both sides equal `1`.
+The Rainbow Bound (`convex_rainbow_bound`) has the same hypotheses and the stronger conclusion
+`Pf A_f(x) ≥ ∏_{k=1}^{n/2} f(x_{n+1−k} − x_k) > 0`.
 
-## Power kernels
+## Status
 
-For `p > 0`, the function `f(r) = r^(−p)` is positive, nonincreasing and convex on `(0, ∞)`, so
-the Convex lower bound applies to it. The exponent is real (`Real.rpow`).
+Numbers refer to the current manuscript draft and may change; the
+[correspondence document](docs/PaperCorrespondence.md) also gives the LaTeX labels.
 
-```lean
-theorem power_kernel_lower_bound (p : ℝ) (hp : 0 < p) (n : ℕ) (hn : Even n) (x : ℕ → ℝ)
-    (hx : StrictMonoOn x (Set.Icc 1 n)) :
-    pfaffian (Icc 1 n) (kernel (fun r => r ^ (-p)) x) ≥ ((x n - x 1) ^ (-p)) ^ (n / 2) ∧
-      ((x n - x 1) ^ (-p)) ^ (n / 2) > 0
-
-theorem albouy_moeckel_pos (n : ℕ) (hn : Even n) (x : ℕ → ℝ)
-    (hx : StrictMonoOn x (Set.Icc 1 n)) :
-    pfaffian (Icc 1 n) (kernel (fun r => r ^ (-2 : ℝ)) x) > 0
-```
-
-The case `p = 2` is the Albouy–Moeckel kernel. That their matrix is this kernel is shown in the
-paper, not here.
-
-For `i ≥ j`, `kernel` evaluates `Real.rpow` at `r ≤ 0`, where its value is a convention. This has
-no effect, since `pfaffian` reads only the entries with `i < j`, where `r > 0`.
-
-Mathlib proves convexity of `r ↦ r^p` only for `p ≥ 1`, concavity only for `0 ≤ p ≤ 1`, and
-convexity for integer exponents. Convexity for negative real exponents (`convexOn_rpow_neg`) is
-proved here by composing with `r ↦ r⁻¹`.
-
-## The rainbow bound
-
-For even `n` and `K` in the additive class `𝒜_n`, removing the outer pair `{1, n}` gives the
-outer-pair bound. Iterating it gives the rainbow bound, a product over the rainbow matching
-`{k, n+1−k}`:
-
-```lean
-theorem outer_pair_bound (n : ℕ) (hn : Even n) (h2 : 2 ≤ n) (K : Matrix ℕ ℕ ℝ)
-    (hK : K ∈ additiveClass n) :
-    pfaffian (Icc 1 n) K ≥ K 1 n * pfaffian (Icc 2 (n - 1)) K
-
-theorem additive_rainbow_bound (n : ℕ) (hn : Even n) (K : Matrix ℕ ℕ ℝ)
-    (hK : K ∈ additiveClass n) :
-    pfaffian (Icc 1 n) K ≥ ∏ k ∈ Icc 1 (n / 2), K k (n + 1 - k) ∧
-      ∏ k ∈ Icc 1 (n / 2), K k (n + 1 - k) ≥ K 1 n ^ (n / 2)
-
-theorem convex_rainbow_bound (f : ℝ → ℝ) (hpos : ∀ t ∈ Set.Ioi (0 : ℝ), 0 < f t)
-    (hanti : AntitoneOn f (Set.Ioi 0)) (hconv : ConvexOn ℝ (Set.Ioi 0) f) (n : ℕ) (hn : Even n)
-    (x : ℕ → ℝ) (hx : StrictMonoOn x (Set.Icc 1 n)) :
-    pfaffian (Icc 1 n) (kernel f x) ≥ ∏ k ∈ Icc 1 (n / 2), f (x (n + 1 - k) - x k) ∧
-      ∏ k ∈ Icc 1 (n / 2), f (x (n + 1 - k) - x k) > 0
-```
-
-`convex_rainbow_bound` has exactly the hypotheses of `convex_lower_bound`, and its bound is the
-stronger one: applied to `K = kernel f x`, the second part of `additive_rainbow_bound` shows that
-the product is at least `f(x_n − x_1)^{n/2}`.
-
-The outer-pair bound is proved through the first-row expansion. Abel summation writes
-`Pf(K) − K(1, n) Pf(K_{[2,n−1]})` as a sum of prefix sums of the bordered-Pfaffian cofactors of
-`K_{[2,n]}`, with coefficients `α_[1,q](K) ≥ 0` and `K(1, n−1) ≥ 0`. Each prefix sum is `≥ 0`
-(`prefixSum_nonneg`): for `h > 0`, `h` times a perturbed prefix sum is the Pfaffian of a family in
-the additive class (`oneBorder`), so it is `≥ 0` by the Additive lower bound, and the prefix sum
-itself follows by letting `h → 0⁺`. The iteration uses that `𝒜_n` is closed under deleting the
-first or the last point.
-
-## Only the rainbow survives
-
-The rainbow is the only perfect matching whose product is a lower bound for every convex kernel.
-`rainbow n` is the matching `{(k, n+1−k) : 1 ≤ k ≤ n/2}`, a perfect matching of `[n]` for even
-`n` (`rainbow_mem_perfectMatchings`). For every other perfect matching, the bound fails for some
-kernel:
-
-```lean
-theorem exists_pfaffian_lt_prod_of_ne_rainbow (n : ℕ) (hn : Even n) (M : Finset (ℕ × ℕ))
-    (hM : M ∈ perfectMatchings (Icc 1 n)) (hMr : M ≠ rainbow n) :
-    ∃ f : ℝ → ℝ, (∀ t ∈ Set.Ioi (0 : ℝ), 0 < f t) ∧ AntitoneOn f (Set.Ioi 0) ∧
-      ConvexOn ℝ (Set.Ioi 0) f ∧
-      ∃ x : ℕ → ℝ, StrictMonoOn x (Set.Icc 1 n) ∧
-        pfaffian (Icc 1 n) (kernel f x) < ∏ e ∈ M, f (x e.2 - x e.1)
-```
-
-For `n = 0` and `n = 2` the rainbow is the only perfect matching, so the statement has content
-for `n ≥ 4`.
-
-The construction uses `f(r) = max(9 − r, 1)`. If `M` first departs from the rainbow at the pair
-`(k+1, n−k)`, the points `k+2, …, n−k−1` are placed at `ε·i`, and the other points at least `8`
-apart from each other, where `f = 1`. At `ε = 0` the inner points coincide: Twin rows removes them in pairs, each
-contributing `f(0) = 9`, so `Pf = 9^{n/2−k−1}`, while the product over `M` is at least
-`(25/9)·9^{n/2−k−1}`. Both sides are continuous in `ε`, so the strict inequality holds for some
-small `ε > 0`, where the points are strictly increasing.
-
-## Results
-
-| Result | Lean | File |
+| Manuscript result | Status | Lean |
 |---|---|---|
-| Pfaffian as a signed sum over perfect matchings | `pfaffian`, `perfectMatchings`, `crossings`, `edges` | `Pfaffian.lean` |
-| Evaluation lemma (Pf commutes with ring homs) | `RingHom.map_pfaffian` | `Pfaffian.lean` |
-| First-row expansion | `pfaffian_insert_of_forall_lt` | `Pfaffian.lean` |
-| Families, `α`, `I_n`, `𝒜_n`, `F_n`, `K_{f,x}` | `intervals`, `pad`, `alpha`, `additiveClass`, `intervalMatrix`, `intervalPfaffian`, `kernel` | `Families.lean` |
-| Twin rows | `pf_twin_rows`, and the general form `pf_twin_rows_consecutive` | `TwinRows.lean` |
-| Interval decomposition | `interval_decomposition`, `interval_decomposition_pfaffian`, `interval_decomposition_corner` | `IntervalDecomposition.lean` |
-| Additivity of convex kernels | `convex_kernel_additive` | `ConvexKernel.lean` |
-| `Pf(𝒯_n) = 1` | `pfaffian_skewOnes` | `PfaffianFacts.lean` |
-| Coefficient positivity | `coeff_nonneg`, `intervalPfaffian_isHomogeneous`, `coeff_corner` | `CoeffPositivity.lean` |
-| The `F_4` check | `intervalPfaffian_four` | `CoeffPositivity.lean` |
-| Additive lower bound | `additive_lower_bound` | `LowerBounds.lean` |
-| Convex lower bound | `convex_lower_bound` | `LowerBounds.lean` |
-| Convex lower bound, skew-symmetric form | `convex_lower_bound_skew` | `LowerBounds.lean` |
-| Power kernels `r^(−p)`, `p > 0` | `power_kernel_lower_bound`, `convexOn_rpow_neg` | `PowerKernels.lean` |
-| Albouy–Moeckel kernel (`p = 2`) | `albouy_moeckel_pos` | `PowerKernels.lean` |
-| Restriction: deleting the first or the last point | `mem_additiveClass_of_succ`, `submatrix_succ_mem_additiveClass` | `Rainbow.lean` |
-| Prefix sums of the bordered-Pfaffian cofactors are `≥ 0` | `prefixSum_nonneg`, `pfaffian_oneBorder`, `oneBorder_mem_additiveClass` | `Rainbow.lean` |
-| Abel summation for the first-row expansion | `firstRowPartial_eq_abel`, `firstRowPartial_eq_sub` | `Rainbow.lean` |
-| Outer-pair bound | `outer_pair_bound` | `Rainbow.lean` |
-| Rainbow bound | `additive_rainbow_bound`, `convex_rainbow_bound` | `Rainbow.lean` |
-| The rainbow matching | `rainbow`, `rainbow_mem_perfectMatchings` | `Sharpness.lean` |
-| Only the rainbow survives | `exists_pfaffian_lt_prod_of_ne_rainbow` | `Sharpness.lean` |
-| First departure from the rainbow | `exists_first_departure` | `Sharpness.lean` |
-| The construction at `ε = 0` | `pfaffian_sharp_zero`, `prod_sharp_zero` | `Sharpness.lean` |
+| Interval Decomposition (Lemma 2.1) | Formalized | `interval_decomposition`, `interval_decomposition_corner`, `interval_decomposition_pfaffian` |
+| Twin Rows (Lemma 3.1) | Formalized (more general) | `pf_twin_rows`, `pf_twin_rows_consecutive` |
+| Coefficient Positivity (Theorem 3.2) | Formalized | `coeff_nonneg`, `intervalPfaffian_isHomogeneous`, `coeff_corner` |
+| Nonnegativity of Interval Coefficients (Lemma 3.4) | Formalized, except the conjunct `f(x_n − x_1) > 0` | `convex_kernel_additive` |
+| Pfaffian Diameter Bound (Theorem 3.5) | Formalized | `convex_lower_bound`, `convex_lower_bound_skew` |
+| Rainbow Bound (Theorem 1.1) | Formalized | `additive_rainbow_bound`, `convex_rainbow_bound` |
+| Alternating Prefix Sums (Lemma 4.1) | Partial: the real inequality `Z_q(A) ≥ 0` only | `prefixSum_nonneg` |
+| Endpoint Inequality (Proposition 4.2) | Partial: the real inequality for `S = [n]` only | `outer_pair_bound` |
+| Singly and Doubly Bordered Pfaffians (Corollaries 5.1, 5.2) | Not formalized | — |
+| Albouy–Moeckel (Corollary 5.3) | Partial: the ordinary even-order Pfaffian only | `albouy_moeckel_pos` |
+| Optimality of the Rainbow Bound (Theorem 1.2) | Partial: a weaker conclusion, by a different construction | `exists_pfaffian_lt_prod_of_ne_rainbow` |
+| Affine Kernel Pfaffian, Constant Outer Layer (Lemmas 6.1, 6.2) | Not formalized | — |
 
-The main proofs are written as named `have` steps, each commented with the step of the argument
-it proves.
+Two partial results deserve emphasis:
 
-## Conventions
+- **Optimality.** The paper proves that for every perfect matching `M` other than the rainbow, the
+  infimum of `Pf A_f(x) / ∏_M f(x_j − x_i)` over `f` and `x` is `0`. Lean proves only that the
+  ratio is `< 1` for some `f` and `x`: the product over `M` is not a universal lower bound.
+- **Albouy–Moeckel.** `albouy_moeckel_pos` proves `Pf A_f(x) > 0` for `f(r) = r^{−2}`. The
+  bordered Pfaffians and the relation to Albouy and Moeckel's normalization are not formalized.
 
-The statements use the following conventions.
+The full table, result-by-result explanations, exact statements and the Lean lemmas that are not
+results of the paper are in [docs/PaperCorrespondence.md](docs/PaperCorrespondence.md).
 
-- **Index sets.** The Pfaffian is defined on any finite set `S` of a linearly ordered type:
-  `pfaffian S A` is the Pfaffian of the principal submatrix of `A` on `S`, in increasing order.
-  `[n] = {1, …, n}` is `Finset.Icc 1 n`, and deleting rows and columns is set difference, so no
-  reindexing is needed. Where a proof does reindex (the map `φ` in Coefficient positivity), it
-  uses `pfaffian_image_strictMono`.
-- **Upper entries only.** `pfaffian` reads only the entries `A a b` with `a < b`. For a
-  skew-symmetric matrix this is the usual signed sum over perfect matchings; for a family `K` it
-  is the Pfaffian of the skew extension (`pfaffian_skewExtension`). For odd `|S|` the Pfaffian
-  is `0`.
-- **Twin rows.** The twin hypothesis is stated on upper entries: `A y z = A y' z` for `z > y'`
-  and `A z y = A z y'` for `z < y`. For a skew-symmetric matrix this says that rows `y` and `y'`
-  agree outside columns `y` and `y'`.
-- **Padding.** The mixed differences `alpha n K` insert the convention
-  `K(0, j) = K(i, n + 1) = 0` explicitly (`pad`), instead of reading row `0` and column `n + 1`
-  of `K`.
-- **`F_n`.** `intervalPfaffian n` lives in `MvPolynomial (intervals n) ℤ`, with exactly one
-  variable for each interval `[p, q]`, `1 ≤ p < q ≤ n`. Its value `F_n(α(K))` is written
-  `MvPolynomial.aeval`.
-- **`f` and `x`.** `f : ℝ → ℝ`, with every hypothesis restricted to `Set.Ioi 0`, and
-  `x : ℕ → ℝ`, required to be strictly increasing on `Icc 1 n` only.
-- **Generality.** Some statements are proved without hypotheses they don't need. For example,
-  Interval decomposition holds for every `n`, and nonnegativity and homogeneity of `F_n` hold for
-  odd `n` as well, where `F_n = 0`.
+## Conventions in brief
 
-## How this formalization was produced
+Comparing a Lean statement with the paper requires the following translations:
 
-The Lean code was written by Claude Opus 5.5 (Anthropic), working in Claude Code from a written
-excerpt of an early draft of the paper's proofs. The work ran in stages. At each stage, the definitions and theorem
-statements were written first, with `sorry` proofs, and reviewed by the author against the paper
-before any proof was written. Approved statements were then frozen in `Spec.lean`. The proofs
-themselves are checked by Lean. The author's review covers the definitions and statements in
-`Spec.lean`, which is what a reader needs to check to trust the result.
+- **Families indexed by `ℕ`, not `n × n` matrices.** Matrices have type `Matrix ℕ ℕ R`, points are
+  sequences `x : ℕ → ℝ` required to be strictly increasing on `Icc 1 n` only, and `f : ℝ → ℝ` has
+  every hypothesis restricted to `Set.Ioi 0`. Nothing uses `Fin n`.
+- **Finite index sets.** `pfaffian S A` is defined for any finite set `S` in a linear order and is
+  the Pfaffian of the principal submatrix on `S`, in increasing order. `[n]` is `Icc 1 n`, and the
+  paper's `Pf(A(S))` is `pfaffian S A`.
+- **Skew extension.** `pfaffian` reads only the entries `A a b` with `a < b`. So the statements
+  take arbitrary families, and the Pfaffian of a family `K` is the Pfaffian of the skew-symmetric
+  matrix `skewExtension K` (`pfaffian_skewExtension`).
+- **The Pfaffian** is the signed sum over perfect matchings with sign `(−1)^{cr(M)}`, which is the
+  paper's definition. It is not related to `det` in this repository.
+- **Names.** The Lean sources use the names of an earlier draft: `additiveClass n` is "nonnegative
+  interval coefficients", `alpha n K J` is the interval coefficient `a_J(K)`, and
+  `intervalPfaffian n` is `Pf_n(a)`.
 
-Two arguments were devised during formalization rather than taken from the draft: the proof that
-the prefix sums of the bordered-Pfaffian cofactors are nonnegative (`prefixSum_nonneg` in
-`Rainbow.lean`, via a one-border family and the limit `h → 0⁺`), a result the draft states without
-proof; and the construction in `Sharpness.lean`, which differs from the draft's proof.
+Details, including padding, signs, and a terminology table, are in
+[Conventions](docs/PaperCorrespondence.md#conventions).
 
-## Auditing
+## Auditing: `Spec.lean`
 
-[`PfaffianLean/Spec.lean`](PfaffianLean/Spec.lean) is the audit surface: it lets a reader check
-the statements without reading any proof.
+[`PfaffianLean/Spec.lean`](PfaffianLean/Spec.lean) lets a reader check the statements without
+reading any proof. It restates every reviewed statement as a `spec_<name>` theorem, pins every
+definition those statements use with a `#print` guard, guards every theorem's axioms, and shows by
+examples that the hypotheses of `convex_lower_bound` are satisfiable. It is imported by the root
+module, so `lake build` fails if any statement, definition or axiom list changes.
 
-- Each statement approved by the author is restated in full as a `spec_<name>` theorem, proved
-  by direct application of the project theorem.
-- Each definition used in a statement is pinned by a `#guard_msgs in #print` of its current form.
-- Each theorem has a `#guard_msgs in #print axioms` guard expecting exactly
-  `[propext, Classical.choice, Quot.sound]`.
-- A final "Non-vacuity" section shows the hypotheses of `convex_lower_bound` are satisfiable:
-  for every even `n`, it applies the theorem with `x k = k` to `f = 1` and to `f t = t⁻¹` (which
-  blows up at `0`), proving all the other hypotheses from Mathlib.
-
-`Spec.lean` is imported by the root module, so a successful `lake build` certifies all of the
-following:
-- the project's theorems prove exactly the statements in `Spec.lean`;
-- the definitions match their pinned forms;
-- no other axioms are used.
-
-That `Spec.lean` is the reviewed version is recorded by the signed commit history (see
-[Verification](#verification)).
-
-The definition of `pfaffian` can also be checked without relying on the crossing-number formula.
-`spec_pfaffian_empty` and `spec_pfaffian_insert_of_forall_lt` together determine `pfaffian` on
-every finite set, by induction on its size, removing the minimum each time. For `S = [n]`, the
-term in which `1` is matched to `j` has sign `(−1)^(j−2) = (−1)^j`, which is the standard
-first-row expansion. So a reader can check the definition either directly or through these two
-lemmas.
-
-## What's trusted
-
-The result relies on three things:
-- Lean's kernel.
-- Mathlib's definitions of the standard notions in the statements: ℝ, `ConvexOn`, `AntitoneOn`,
-  `StrictMonoOn`, `Even`, `Finset`, `Set.Icc`, `Matrix` and `MvPolynomial`. `MvPolynomial` is
-  used only in the intermediate statements. The power-kernel results also use `Real.rpow`.
-- The project definitions pinned in `Spec.lean`. The main theorem uses only five of them:
-  `edges`, `perfectMatchings`, `crossings`, `pfaffian` and `kernel`, plus `skewExtension` for the
-  skew form; so do the power-kernel results and `convex_rainbow_bound`. `intervals`, `pad`,
-  `alpha` and `additiveClass` also appear in the statements about the additive class
-  (`additive_lower_bound`, `outer_pair_bound` and `additive_rainbow_bound`), and
-  `intervalMatrix` and `intervalPfaffian` only in intermediate statements. The sharpness result
-  `exists_pfaffian_lt_prod_of_ne_rainbow` also uses `rainbow`.
+`Spec.lean` certifies what the Lean theorems say, not how they relate to the paper; that relation
+is the subject of the correspondence document. Provenance, the trusted base, signed commits and
+reproducibility are covered in [docs/Auditing.md](docs/Auditing.md).
 
 ## Building
 
-The project uses Lean `v4.34.1` (see `lean-toolchain`) and Mathlib `v4.34.1`.
+The project uses Lean `v4.34.1` (see `lean-toolchain`) and Mathlib `v4.34.1` (pinned in
+`lake-manifest.json`).
 
 ```sh
 lake exe cache get   # download prebuilt Mathlib
 lake build
 ```
 
-Sanity tests are in `PfaffianLean/Tests.lean`:
-- the `n = 2` and `n = 4` formulas;
-- the value `418` for the skew matrix with `A_ij = 10i + j` for `i < j`, evaluated by `#guard`;
-- `Pf(𝒯_n) = 1` at `n = 2, 4, 6`.
+CI builds the project on every push and pull request. Sanity tests are in
+`PfaffianLean/Tests.lean`; see [Reproducibility](docs/Auditing.md#reproducibility).
 
-The `F_4` expansion is checked in `CoeffPositivity.lean`.
-
-## Layout
+## Repository layout
 
 | File | Contents |
 |---|---|
 | `PfaffianLean/Pfaffian.lean` | Definition of the Pfaffian; evaluation lemma; first-row expansion |
 | `PfaffianLean/Tests.lean` | Sanity tests for the definition, including a `#guard` evaluation |
-| `PfaffianLean/Families.lean` | Families, mixed differences, the additive class, `F_n`, `K_{f,x}` |
-| `PfaffianLean/IntervalDecomposition.lean` | Interval decomposition |
-| `PfaffianLean/ConvexKernel.lean` | Additivity of convex kernels |
-| `PfaffianLean/TwinRows.lean` | Twin rows (partner-swap involution) |
+| `PfaffianLean/Families.lean` | Families, interval coefficients, `additiveClass`, `Pf_n`, `kernel` |
+| `PfaffianLean/IntervalDecomposition.lean` | Interval Decomposition |
+| `PfaffianLean/ConvexKernel.lean` | Nonnegativity of Interval Coefficients |
+| `PfaffianLean/TwinRows.lean` | Twin Rows (partner-swap involution) |
 | `PfaffianLean/PfaffianFacts.lean` | `Pf(cA)`, reindexing, zero rows, `Pf(𝒯_n) = 1` |
-| `PfaffianLean/CoeffPositivity.lean` | Coefficient positivity and the `F_4` check |
-| `PfaffianLean/LowerBounds.lean` | Additive and Convex lower bounds |
-| `PfaffianLean/PowerKernels.lean` | Power kernels `r^(−p)` and the Albouy–Moeckel case |
-| `PfaffianLean/Rainbow.lean` | Outer-pair bound and the rainbow bound |
-| `PfaffianLean/Sharpness.lean` | The rainbow matching; only the rainbow survives |
+| `PfaffianLean/CoeffPositivity.lean` | Coefficient Positivity and the `F_4` check |
+| `PfaffianLean/LowerBounds.lean` | Additive lower bound; Pfaffian Diameter Bound |
+| `PfaffianLean/PowerKernels.lean` | Power kernels `r^(−p)` and the case `p = 2` |
+| `PfaffianLean/Rainbow.lean` | Real forms of Alternating Prefix Sums and the Endpoint Inequality; Rainbow Bound |
+| `PfaffianLean/Sharpness.lean` | The rainbow matching; weak form of the Optimality theorem |
 | `PfaffianLean/Spec.lean` | Frozen statements, definition guards, axiom guards and non-vacuity examples |
+| `docs/PaperCorrespondence.md` | Theorem-by-theorem correspondence with the manuscript |
+| `docs/Auditing.md` | Provenance, `Spec.lean`, trusted base, signed commits, reproducibility |
 
-## Verification
+## Authorship
 
-Commits and release tags are signed with the SSH key `SHA256:rbBuGOZMBxVRlDiLsdjqGtmhfobwvKrNbBt0dQxzivU` (ed25519), whose public key is in `allowed_signers`. To verify:
-
-```
-git config gpg.ssh.allowedSignersFile allowed_signers
-git log --show-signature
-```
+The Lean code was written by Claude Opus 5.5 (Anthropic), working in Claude Code from a written
+excerpt of an early draft of the paper's proofs. The author reviewed the definitions and theorem
+statements frozen in `Spec.lean` against the paper before their proofs were written; the proofs
+are checked by Lean. Internal helper lemmas were not part of that review. See
+[How this formalization was produced](docs/Auditing.md#how-this-formalization-was-produced).
 
 ## License
 
